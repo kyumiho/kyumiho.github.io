@@ -1,189 +1,242 @@
 import { motion } from 'framer-motion'
 
 const languages = [
-  { name: 'C', color: '#00599C' },
-  { name: 'Ruby', color: '#CC342D' },
-  { name: 'Java', color: '#ED8B00' },
-  { name: 'HTML/CSS/JS', color: '#E34F26' },
-  { name: 'C++', color: '#00599C' },
-  { name: 'Unix', color: '#FCC624' },
-  { name: 'Kotlin', color: '#7F52FF' },
-  { name: 'C#', color: '#239120' },
-  { name: 'Python', color: '#3776AB' },
+  { name: 'C',           icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg' },
+  { name: 'Ruby',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg' },
+  { name: 'Java',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg' },
+  { name: 'HTML',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg' },
+  { name: 'CSS',         icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg' },
+  { name: 'JavaScript',  icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg' },
+  { name: 'C++',         icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg' },
+  { name: 'Unix',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg' },
+  { name: 'Kotlin',      icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg' },
+  { name: 'C#',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg' },
+  { name: 'Python',      icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
 ]
 
 const tools = [
-  { name: 'Eclipse', icon: '🌑' },
-  { name: 'Visual Studio', icon: '💜' },
-  { name: 'RubyMine', icon: '💎' },
-  { name: 'Windows', icon: '🪟' },
-  { name: 'Firebase', icon: '🔥' },
-  { name: 'Unity', icon: '🎮' },
-  { name: 'Ruby on Rails', icon: '🛤️' },
-  { name: 'Git', icon: '🔀' },
-  { name: 'Oracle SQL', icon: '🗄️' },
-  { name: 'MySQL', icon: '🐬' },
-  { name: 'Spotfire', icon: '📊' },
-  { name: 'KNIME', icon: '🔬' },
+  { name: 'Eclipse',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/eclipse/eclipse-original.svg' },
+  { name: 'Visual Studio',  icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visualstudio/visualstudio-plain.svg' },
+  { name: 'RubyMine',       icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rubymine/rubymine-original.svg' },
+  { name: 'Windows',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg' },
+  { name: 'Firebase',       icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg' },
+  { name: 'Unity',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/unity/unity-original.svg' },
+  { name: 'Ruby on Rails',  icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg' },
+  { name: 'Git',            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
+  { name: 'Oracle SQL',     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg' },
+  { name: 'MySQL',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+  { name: 'Spotfire',       icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apache/apache-original.svg' },
+  { name: 'KNIME',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/anaconda/anaconda-original.svg' },
 ]
 
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
+}
+
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  show: (i = 0) => ({
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] } },
+}
+
+// 빗방울 낙하 애니메이션 — 각 카드마다 랜덤 딜레이로 자연스러운 비 효과
+const rainDrop = (index) => ({
+  hidden: { opacity: 0, y: -80 },
+  show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.05, ease: 'easeOut' },
-  }),
+    transition: {
+      delay: Math.random() * 0.6,   // 0~0.6초 랜덤 딜레이
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1],     // 빠르게 떨어지고 살짝 튕기는 느낌
+    },
+  },
+})
+
+function TechCard({ name, icon, index }) {
+  return (
+    <motion.div
+      variants={rainDrop(index)}
+      whileHover={{ scale: 1.05, y: -4 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+      className="flex flex-col items-center gap-2.5 p-4 rounded-2xl cursor-default"
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <img src={icon} alt={name} className="w-9 h-9 object-contain" />
+      <span className="text-xs text-white/40 text-center leading-tight">{name}</span>
+    </motion.div>
+  )
 }
 
 export default function Home() {
   return (
-    <main className="min-h-screen pt-24 pb-20 px-6 max-w-6xl mx-auto">
-      {/* Hero */}
-      <section className="py-20 flex flex-col items-start gap-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-mono"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-          Available for opportunities
-        </motion.div>
+    <main className="min-h-screen">
 
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-7xl font-bold text-white leading-tight tracking-tight"
-        >
-          Hi, I'm{' '}
-          <span className="relative inline-block">
-            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-              Lebant
-            </span>
-            <motion.span
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-400 to-cyan-400 origin-left"
-            />
-          </span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed"
-        >
-          A passionate software developer who loves building things that live on the internet.
-          I enjoy turning complex problems into simple, beautiful, and intuitive solutions.
-        </motion.p>
+      {/* ── Hero ── */}
+      <section className="relative flex flex-col items-center justify-center min-h-screen text-center px-6 overflow-hidden">
+        {/* Ambient glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(120,80,255,0.12) 0%, transparent 70%)' }}
+          />
+        </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex items-center gap-4"
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+          className="relative z-10 flex flex-col items-center gap-6 max-w-3xl"
         >
-          <a
-            href="/projects"
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-medium text-sm hover:shadow-lg hover:shadow-violet-500/25 transition-all duration-300 hover:scale-105"
+          <motion.p
+            variants={fadeUp}
+            className="text-xs font-medium tracking-[0.2em] uppercase"
+            style={{ color: 'rgba(255,255,255,0.35)' }}
           >
-            View Projects
-          </a>
-          <a
-            href="/contact"
-            className="px-6 py-3 rounded-xl border border-white/10 text-zinc-300 font-medium text-sm hover:border-white/20 hover:text-white transition-all duration-300"
+            Software Engineer
+          </motion.p>
+
+          <motion.h1
+            variants={fadeUp}
+            className="text-6xl md:text-8xl font-bold tracking-tight"
+            style={{
+              color: '#f5f5f7',
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
+            }}
           >
-            Contact Me
-          </a>
+            SeongRok Ha
+            <br />
+            <span style={{ color: 'rgba(245,245,247,0.45)' }}>Simon.</span>
+          </motion.h1>
+
+          <motion.p
+            variants={fadeUp}
+            className="text-lg md:text-xl max-w-xl leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+          >
+            Studying Computer Science & Engineering in the United States.
+            From South Korea — passionate about building great software.
+          </motion.p>
+
+          <motion.div variants={fadeUp} className="flex items-center gap-3 mt-2">
+            <a
+              href="/projects"
+              className="px-6 py-2.5 rounded-full text-sm font-medium text-white transition-all duration-300"
+              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.12)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+            >
+              View Projects
+            </a>
+            <a
+              href="/contact"
+              className="px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300"
+              style={{ color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
+            >
+              Contact Me
+            </a>
+          </motion.div>
         </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+            className="w-px h-10"
+            style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}
+          />
+        </motion.div>
+      </section>
+
+      {/* ── Languages ── */}
+      <section className="py-36 px-6">
+        <div style={{ maxWidth: '896px', margin: '0 auto' }}>
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: false, margin: '-80px' }}
+            variants={stagger}
+          >
+            <motion.p
+              variants={fadeUp}
+              className="text-center text-xs font-medium tracking-[0.2em] uppercase"
+              style={{ color: 'rgba(255,255,255,0.25)', marginTop: '10px', marginBottom: '10px' }}
+            >
+              Languages
+            </motion.p>
+            <motion.h2
+              variants={fadeUp}
+              className="text-center text-4xl md:text-5xl font-bold"
+              style={{ color: '#f5f5f7', letterSpacing: '-0.025em', marginBottom: '50px' }}
+            >
+              What I Code With.
+            </motion.h2>
+
+            <motion.div
+              variants={stagger}
+              className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 gap-3"
+            >
+              {languages.map((lang, i) => (
+                <TechCard key={lang.name} {...lang} index={i} />
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-4" />
-
-      {/* Languages */}
-      <section className="py-16">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-50px' }}
-        >
-          <motion.p variants={fadeUp} custom={0} className="text-xs font-mono text-violet-400 uppercase tracking-widest mb-3">
-            Languages
-          </motion.p>
-          <motion.h2 variants={fadeUp} custom={1} className="text-2xl md:text-3xl font-bold text-white mb-10">
-            What I code with
-          </motion.h2>
-
-          <div className="flex flex-wrap gap-3">
-            {languages.map((lang, i) => (
-              <motion.div
-                key={lang.name}
-                variants={fadeUp}
-                custom={i + 2}
-                whileHover={{ scale: 1.06, y: -2 }}
-                className="group relative px-5 py-3 rounded-xl border border-white/8 bg-white/3 backdrop-blur-sm cursor-default"
-              >
-                <span
-                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `${lang.color}15`, borderColor: `${lang.color}40` }}
-                />
-                <span className="relative text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">
-                  {lang.name}
-                </span>
-                <span
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 group-hover:w-3/4 rounded-full transition-all duration-300"
-                  style={{ background: lang.color }}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Tools */}
-      <section className="py-8">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-50px' }}
-        >
-          <motion.p variants={fadeUp} custom={0} className="text-xs font-mono text-cyan-400 uppercase tracking-widest mb-3">
-            Tools & Technologies
-          </motion.p>
-          <motion.h2 variants={fadeUp} custom={1} className="text-2xl md:text-3xl font-bold text-white mb-10">
-            My toolbox
-          </motion.h2>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {tools.map((tool, i) => (
-              <motion.div
-                key={tool.name}
-                variants={fadeUp}
-                custom={i + 2}
-                whileHover={{ scale: 1.04, y: -3 }}
-                className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/8 bg-white/3 hover:bg-white/6 hover:border-white/15 transition-all duration-300 cursor-default group"
-              >
-                <span className="text-xl">{tool.icon}</span>
-                <span className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">
-                  {tool.name}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Background decoration */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-cyan-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-violet-600/6 rounded-full blur-3xl" />
+      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
       </div>
+
+      {/* ── Tools ── */}
+      <section className="py-36 px-6" style={{ paddingTop: '100px', paddingBottom: '120px' }}>
+        <div style={{ maxWidth: '896px', margin: '0 auto' }}>
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: false, margin: '-80px' }}
+            variants={stagger}
+          >
+            <motion.p
+              variants={fadeUp}
+              className="text-center text-xs font-medium tracking-[0.2em] uppercase"
+              style={{ color: 'rgba(255,255,255,0.25)', marginTop: '10px', marginBottom: '10px' }}
+            >
+              Tools & Technologies
+            </motion.p>
+            <motion.h2
+              variants={fadeUp}
+              className="text-center text-4xl md:text-5xl font-bold"
+              style={{ color: '#f5f5f7', letterSpacing: '-0.025em', marginBottom: '50px' }}
+            >
+              My Toolbox.
+            </motion.h2>
+
+            <motion.div
+              variants={stagger}
+              className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 gap-3"
+            >
+              {tools.map((tool, i) => (
+                <TechCard key={tool.name} {...tool} index={i} />
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
     </main>
   )
 }

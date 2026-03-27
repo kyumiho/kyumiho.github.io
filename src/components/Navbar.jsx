@@ -15,92 +15,72 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    setMenuOpen(false)
-  }, [pathname])
+  useEffect(() => setMenuOpen(false), [pathname])
 
   return (
     <motion.nav
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20'
-          : 'bg-transparent'
-      }`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      style={{
+        background: scrolled ? 'rgba(0,0,0,0.72)' : 'transparent',
+        backdropFilter: scrolled ? 'saturate(180%) blur(20px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'saturate(180%) blur(20px)' : 'none',
+        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+      }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
     >
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 24px' }} className="h-12 flex items-center justify-between">
         {/* Logo */}
         <Link to="/">
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="font-mono text-lg font-medium text-white tracking-tight"
-          >
-            <span className="text-violet-400">&lt;</span>
-            lebant
-            <span className="text-cyan-400">ion</span>
-            <span className="text-violet-400"> /&gt;</span>
-          </motion.span>
+          <span className="text-sm font-medium text-white/90 tracking-tight">
+            Simon Ha
+          </span>
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center" style={{ gap: '13px' }}>
           {links.map(({ to, label }) => (
             <Link key={to} to={to}>
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+              <span
+                className={`px-3 py-1.5 font-medium rounded-full transition-all duration-300 ${
                   pathname === to
-                    ? 'text-white'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'text-white bg-white/10'
+                    : 'text-white/60 hover:text-white/90'
                 }`}
+                style={{ fontSize: '13px' }}
               >
-                {pathname === to && (
-                  <motion.span
-                    layoutId="nav-pill"
-                    className="absolute inset-0 rounded-lg bg-white/8 border border-white/10"
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
-                  />
-                )}
-                <span className="relative z-10">{label}</span>
-              </motion.span>
+                {label}
+              </span>
             </Link>
           ))}
         </div>
 
         {/* Resume button */}
         <div className="hidden md:block">
-          <motion.a
+          <a
             href="/assets/Resume.pdf"
             download
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            className="relative inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg overflow-hidden group"
+            className="px-4 py-1.5 text-xs font-medium text-white bg-white/10 hover:bg-white/20 rounded-full border-none transition-all duration-300"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-violet-600 to-cyan-500 opacity-90 group-hover:opacity-100 transition-opacity" />
-            <span className="absolute inset-0 bg-gradient-to-r from-violet-600 to-cyan-500 blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
-            <svg className="relative z-10 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            <span className="relative z-10">Resume</span>
-          </motion.a>
+            Resume
+          </a>
         </div>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden text-zinc-400 hover:text-white p-2"
+          className="md:hidden text-white/60 hover:text-white p-1"
           onClick={() => setMenuOpen(v => !v)}
         >
-          <div className="w-5 h-4 flex flex-col justify-between">
-            <span className={`block h-0.5 bg-current transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
-            <span className={`block h-0.5 bg-current transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block h-0.5 bg-current transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[9px]' : ''}`} />
+          <div className="w-5 flex flex-col gap-1.5">
+            <span className={`block h-px bg-current transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block h-px bg-current transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-px bg-current transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
           </div>
         </button>
       </div>
@@ -113,17 +93,16 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/5"
+            style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)' }}
+            className="md:hidden border-t border-white/8"
           >
-            <div className="px-6 py-4 flex flex-col gap-2">
+            <div className="px-6 py-4 flex flex-col gap-1">
               {links.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    pathname === to
-                      ? 'bg-white/8 text-white border border-white/10'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                  className={`px-3 py-2.5 rounded-xl text-sm transition-colors ${
+                    pathname === to ? 'text-white bg-white/8' : 'text-white/60 hover:text-white'
                   }`}
                 >
                   {label}
@@ -132,9 +111,9 @@ export default function Navbar() {
               <a
                 href="/assets/Resume.pdf"
                 download
-                className="mt-2 px-4 py-3 rounded-lg text-sm font-medium text-white text-center bg-gradient-to-r from-violet-600 to-cyan-500"
+                className="mt-2 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:text-white transition-colors"
               >
-                Download Resume
+                Resume ↓
               </a>
             </div>
           </motion.div>

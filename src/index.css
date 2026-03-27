@@ -1,16 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @import "tailwindcss";
-
-:root {
-  --bg: #0a0a0f;
-  --bg2: #111118;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #a1a1aa;
-  --text-h: #f4f4f5;
-  --accent: #7c3aed;
-  --accent2: #06b6d4;
-}
 
 * {
   box-sizing: border-box;
@@ -23,24 +13,18 @@ html {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
+  background: #000;
+  color: #86868b;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
+  width: 0px;
 }
 
 ::selection {
-  background: rgba(124, 58, 237, 0.4);
-  color: #f4f4f5;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
 }
