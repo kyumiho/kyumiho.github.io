@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" npm run build)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" npm install framer-motion react-router-dom)"
+    ]
+  }
+}
