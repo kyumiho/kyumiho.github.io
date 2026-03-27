@@ -132,7 +132,6 @@ export default function Contact() {
                   required
                   className="w-full py-3.5 rounded-2xl text-sm placeholder:text-white/20 focus:border-white/20 transition-all"
                   style={{ ...inputStyle, paddingLeft: '32px', paddingRight: '20px' }}
-                  style={inputStyle}
                   onFocus={e => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
                 />

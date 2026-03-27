@@ -39,9 +39,9 @@ const fadeUp = {
 
 export default function Projects() {
   return (
-    <main style={{ minHeight: '100vh', paddingTop: '120px', paddingBottom: '120px', paddingLeft: '24px', paddingRight: '24px' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', paddingTop: '100px', paddingBottom: '100px', paddingLeft: '24px', paddingRight: '24px' }}>
       <div style={{ maxWidth: '896px', margin: '0 auto' }}>
-        <motion.div initial="hidden" animate="show" variants={stagger}>
+        <motion.div initial="hidden" animate="show" variants={stagger} style={{ width: '100%' }}>
           <motion.p
             variants={fadeUp}
             className="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center"

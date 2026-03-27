@@ -156,26 +156,6 @@ export default function Home() {
             From South Korea — passionate about building great software.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="flex items-center gap-3 mt-2">
-            <a
-              href="/projects"
-              className="px-6 py-2.5 rounded-full text-sm font-medium text-white transition-all duration-300"
-              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.12)' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
-            >
-              View Projects
-            </a>
-            <a
-              href="/contact"
-              className="px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300"
-              style={{ color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)' }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
-            >
-              Contact Me
-            </a>
-          </motion.div>
         </motion.div>
 
         <motion.div
@@ -371,7 +351,7 @@ export default function Home() {
                   graduate from{' '}
                   <span style={{ color: 'rgba(255,255,255,0.85)' }}>The Ohio State University</span>{' '}
                   (May 2023), specializing in Software Engineering. Currently working as an{' '}
-                  <span style={{ color: 'rgba(255,255,255,0.85)' }}>MES Specialist (Business System Analyst)</span>{' '}
+                  <span style={{ color: 'rgba(255,255,255,0.85)' }}>Lead Business System Analyst</span>{' '}
                   at SK Battery America, designing and implementing Manufacturing Execution System processes.
                 </p>
                 <p className="text-sm leading-7 mt-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -405,11 +385,11 @@ export default function Home() {
                   className="rounded-2xl"
                   style={{ padding: '27px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
-                  <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.22)' }}>
+                  <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
                     Current Role
                   </p>
                   <p className="text-sm font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                    MES Specialist · Business System Analyst
+                    Lead Business System Analyst
                   </p>
                   <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
                     SK Battery America · Sep 2023 – Present
@@ -422,10 +402,10 @@ export default function Home() {
                   className="rounded-2xl"
                   style={{ padding: '27px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
-                  <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.22)' }}>
+                  <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
                     Location
                   </p>
-                  <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Columbus, OH</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Duluth, GA</p>
                   <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Open to Remote</p>
                 </motion.div>
               </div>
