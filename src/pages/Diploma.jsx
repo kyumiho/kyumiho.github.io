@@ -57,8 +57,8 @@ export default function Diploma() {
           </motion.h1>
           <motion.p
             variants={fadeUp}
-            className="text-center text-lg mb-20"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
+            className="text-center text-lg"
+            style={{ color: 'rgba(255,255,255,0.35)', marginBottom: '110px' }}
           >
             My academic background and work experience.
           </motion.p>
@@ -66,12 +66,12 @@ export default function Diploma() {
           {/* Education */}
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase mb-4"
-            style={{ color: 'rgba(255,255,255,0.2)' }}
+            className="text-xs font-medium tracking-[0.2em] uppercase"
+            style={{ color: 'rgba(255,255,255,0.2)', marginBottom: '19px' }}
           >
             Education
           </motion.p>
-          <div className="flex flex-col gap-4 mb-16">
+          <div className="flex flex-col gap-4" style={{ marginBottom: '74px' }}>
             {education.map((edu, i) => (
               <motion.div
                 key={i}
@@ -125,8 +125,8 @@ export default function Diploma() {
           {/* Work Experience */}
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase mb-4"
-            style={{ color: 'rgba(255,255,255,0.2)' }}
+            className="text-xs font-medium tracking-[0.2em] uppercase"
+            style={{ color: 'rgba(255,255,255,0.2)', marginBottom: '19px' }}
           >
             Work Experience
           </motion.p>

@@ -58,8 +58,8 @@ export default function Projects() {
           </motion.h1>
           <motion.p
             variants={fadeUp}
-            className="text-center text-lg mb-20"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
+            className="text-center text-lg"
+            style={{ color: 'rgba(255,255,255,0.35)', marginBottom: '110px' }}
           >
             Things I've built and shipped.
           </motion.p>
