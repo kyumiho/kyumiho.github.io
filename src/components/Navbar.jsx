@@ -38,7 +38,8 @@ export default function Navbar() {
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 24px' }} className="h-12 flex items-center justify-between">
         {/* Logo */}
         <Link to="/">
-          <span className="text-sm font-medium text-white/90 tracking-tight">
+          <span className="flex items-center gap-1.5 text-sm font-medium text-white/90 tracking-tight">
+            <span style={{ fontSize: '16px', lineHeight: 1 }}>✦</span>
             Simon Ha
           </span>
         </Link>

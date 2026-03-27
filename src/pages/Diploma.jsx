@@ -78,8 +78,9 @@ export default function Diploma() {
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="p-8 rounded-3xl"
+                className="rounded-3xl"
                 style={{
+                  padding: '40px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}
@@ -136,8 +137,9 @@ export default function Diploma() {
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="p-8 rounded-3xl"
+                className="rounded-3xl"
                 style={{
+                  padding: '40px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}
