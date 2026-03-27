@@ -43,25 +43,29 @@ export default function Diploma() {
         <motion.div initial="hidden" animate="show" variants={stagger} style={{ width: '100%' }}>
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center"
-            style={{ color: 'rgba(255,255,255,0.25)' }}
+            className="text-xs font-medium tracking-[0.2em] uppercase text-center"
+            style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '20px' }}
           >
             Education & Experience
           </motion.p>
           <motion.h1
             variants={fadeUp}
-            className="text-5xl md:text-7xl font-bold text-center mb-6"
-            style={{ color: '#f5f5f7', letterSpacing: '-0.03em' }}
+            className="text-5xl md:text-7xl font-bold text-center"
+            style={{ color: '#f5f5f7', letterSpacing: '-0.03em', marginBottom: '16px' }}
           >
             Diploma.
           </motion.h1>
           <motion.p
             variants={fadeUp}
             className="text-center text-lg"
-            style={{ color: 'rgba(255,255,255,0.35)', marginBottom: '110px' }}
+            style={{ color: 'rgba(255,255,255,0.35)', marginBottom: '40px' }}
           >
             My academic background and work experience.
           </motion.p>
+          <motion.div
+            variants={fadeUp}
+            style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '60px' }}
+          />
 
           {/* Education */}
           <motion.p
