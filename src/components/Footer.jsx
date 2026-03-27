@@ -68,6 +68,20 @@ export default function Footer() {
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.18)' }}>
               © {new Date().getFullYear()} lahel97@gmail.com
             </p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.14)' }}>
+              Built with{' '}
+              <a
+                href="https://claude.ai/code"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: 'rgba(180,160,255,0.5)' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'rgba(180,160,255,0.9)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'rgba(180,160,255,0.5)'}
+                className="transition-colors duration-200"
+              >
+                Claude Code
+              </a>
+            </p>
           </div>
 
           {/* Center — nav links */}

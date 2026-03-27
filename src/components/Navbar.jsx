@@ -64,7 +64,7 @@ export default function Navbar() {
         {/* Resume button */}
         <div className="hidden md:block">
           <a
-            href="/assets/Resume.pdf"
+            href="/assets/RESUME.pdf"
             download
             className="px-4 py-1.5 text-xs font-medium text-white bg-white/10 hover:bg-white/20 rounded-full border-none transition-all duration-300"
           >
@@ -109,7 +109,7 @@ export default function Navbar() {
                 </Link>
               ))}
               <a
-                href="/assets/Resume.pdf"
+                href="/assets/RESUME.pdf"
                 download
                 className="mt-2 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:text-white transition-colors"
               >
