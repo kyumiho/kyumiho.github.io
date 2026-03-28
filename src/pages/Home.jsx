@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* Divider */}
-      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '5px 24px' }}>
+      <div style={{ maxWidth: '896px', margin: '0 auto', paddingTop: '24px', paddingBottom: '5px', paddingLeft: '24px', paddingRight: '24px' }}>
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
       </div>
 
@@ -243,7 +243,7 @@ export default function Home() {
       </section>
 
       {/* Divider */}
-      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '5px 24px' }}>
+      <div style={{ maxWidth: '896px', margin: '0 auto', paddingTop: '24px', paddingBottom: '5px', paddingLeft: '24px', paddingRight: '24px' }}>
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
       </div>
 

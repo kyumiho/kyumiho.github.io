@@ -53,16 +53,35 @@ const inputStyle = {
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | loading | success | error
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const subject = encodeURIComponent(`Contact from ${form.name}`)
-    const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)
-    window.location.href = `mailto:lahel97@gmail.com?subject=${subject}&body=${body}`
-    setSent(true)
+    setStatus('loading')
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_KEY,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          subject: `Portfolio contact from ${form.name}`,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setStatus('success')
+        setForm({ name: '', email: '', message: '' })
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -131,7 +150,7 @@ export default function Contact() {
                   placeholder={f.placeholder}
                   required
                   className="w-full py-3.5 rounded-2xl text-sm placeholder:text-white/20 focus:border-white/20 transition-all"
-                  style={{ ...inputStyle, paddingLeft: '32px', paddingRight: '20px' }}
+                  style={{ ...inputStyle, paddingLeft: '20px', paddingRight: '20px' }}
                   onFocus={e => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
                 />
@@ -149,14 +168,26 @@ export default function Contact() {
               onFocus={e => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
               onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
             />
+
+            {status === 'error' && (
+              <p className="text-xs text-center" style={{ color: 'rgba(255,100,100,0.7)' }}>
+                Something went wrong. Please try again or email me directly.
+              </p>
+            )}
+
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+              disabled={status === 'loading' || status === 'success'}
+              whileHover={status === 'idle' || status === 'error' ? { scale: 1.01 } : {}}
+              whileTap={status === 'idle' || status === 'error' ? { scale: 0.99 } : {}}
               className="w-full py-3.5 rounded-2xl text-sm font-medium text-white transition-all duration-300"
-              style={{ background: sent ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{
+                background: status === 'success' ? 'rgba(80,200,120,0.12)' : 'rgba(255,255,255,0.1)',
+                border: status === 'success' ? '1px solid rgba(80,200,120,0.25)' : '1px solid rgba(255,255,255,0.1)',
+                cursor: status === 'loading' || status === 'success' ? 'default' : 'pointer',
+              }}
             >
-              {sent ? '✓ Sent' : 'Send Message'}
+              {status === 'loading' ? 'Sending…' : status === 'success' ? '✓ Message Sent!' : 'Send Message'}
             </motion.button>
           </motion.form>
         </motion.div>
