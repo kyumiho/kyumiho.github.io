@@ -3,7 +3,8 @@
     "allow": [
       "Bash(PATH=\"/opt/homebrew/bin:$PATH\" npm run build)",
       "Bash(PATH=\"/opt/homebrew/bin:$PATH\" npm install framer-motion react-router-dom)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm run:*)"
     ]
   }
 }
