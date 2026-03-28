@@ -39,7 +39,7 @@ const fadeUp = {
 
 export default function Projects() {
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', paddingTop: '100px', paddingBottom: '100px', paddingLeft: '24px', paddingRight: '24px' }}>
+    <main className="min-h-screen flex items-center py-20 md:py-28 px-6">
       <div style={{ maxWidth: '896px', margin: '0 auto' }}>
         <motion.div initial="hidden" animate="show" variants={stagger} style={{ width: '100%' }}>
           <motion.p
@@ -75,9 +75,8 @@ export default function Projects() {
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="rounded-3xl"
+                className="rounded-3xl p-6 md:p-10"
                 style={{
-                  padding: '40px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}
