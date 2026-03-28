@@ -315,7 +315,7 @@ export default function Home() {
       </div>
 
       {/* ── About / Bio ── */}
-      <section className="px-6 pt-12 pb-24 md:pb-44">
+      <section className="px-6" style={{ paddingTop: '48px', paddingBottom: '160px' }}>
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div
             initial="hidden"
@@ -342,8 +342,8 @@ export default function Home() {
               {/* Bio */}
               <motion.div
                 variants={fadeUp}
-                className="rounded-3xl p-8 md:p-11"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                className="rounded-3xl"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '44px' }}
               >
                 <p className="text-sm leading-7" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   I'm a{' '}
@@ -366,8 +366,8 @@ export default function Home() {
                 {/* AI Agent */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl p-6 md:p-8"
-                  style={{ background: 'rgba(120,80,255,0.07)', border: '1px solid rgba(120,80,255,0.18)' }}
+                  className="rounded-2xl"
+                  style={{ background: 'rgba(120,80,255,0.07)', border: '1px solid rgba(120,80,255,0.18)', padding: '32px' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: 'rgba(180,160,255,0.55)' }}>
                     AI Agent Proficiency
@@ -382,8 +382,8 @@ export default function Home() {
                 {/* Current Role */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl p-6 md:p-8"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                  className="rounded-2xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '32px' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
                     Current Role
@@ -399,8 +399,8 @@ export default function Home() {
                 {/* Location */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl p-6 md:p-8"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                  className="rounded-2xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '32px' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
                     Location

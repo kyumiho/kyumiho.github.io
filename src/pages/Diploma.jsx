@@ -171,8 +171,9 @@ export default function Diploma() {
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="rounded-3xl p-7 md:p-11"
+                className="rounded-3xl"
                 style={{
+                  padding: '44px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}
