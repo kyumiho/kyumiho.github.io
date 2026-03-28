@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* Divider */}
-      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '5px 24px' }}>
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
       </div>
 
@@ -243,7 +243,7 @@ export default function Home() {
       </section>
 
       {/* Divider */}
-      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '5px 24px' }}>
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
       </div>
 
@@ -310,12 +310,12 @@ export default function Home() {
       </section>
 
       {/* Divider */}
-      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '5px 24px' }}>
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
       </div>
 
       {/* ── About / Bio ── */}
-      <section className="px-6 pt-12 pb-16 md:pb-32">
+      <section className="px-6 pt-12 pb-24 md:pb-44">
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div
             initial="hidden"
@@ -342,7 +342,7 @@ export default function Home() {
               {/* Bio */}
               <motion.div
                 variants={fadeUp}
-                className="rounded-3xl p-6 md:p-9"
+                className="rounded-3xl p-8 md:p-11"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <p className="text-sm leading-7" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -354,7 +354,7 @@ export default function Home() {
                   <span style={{ color: 'rgba(255,255,255,0.85)' }}>Lead Business System Analyst</span>{' '}
                   at SK Battery America, designing and implementing Manufacturing Execution System processes.
                 </p>
-                <p className="text-sm leading-7 mt-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="text-sm leading-7 mt-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   With hands-on experience in full-stack development — React, Python, Java, Django, Ruby on Rails — and a
                   background in Agile methodologies and OOP, I bridge technical depth with business-oriented thinking.
                   I thrive in roles where software meets strategy.
@@ -366,7 +366,7 @@ export default function Home() {
                 {/* AI Agent */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl p-5 md:p-7"
+                  className="rounded-2xl p-6 md:p-8"
                   style={{ background: 'rgba(120,80,255,0.07)', border: '1px solid rgba(120,80,255,0.18)' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: 'rgba(180,160,255,0.55)' }}>
@@ -382,7 +382,7 @@ export default function Home() {
                 {/* Current Role */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl p-5 md:p-7"
+                  className="rounded-2xl p-6 md:p-8"
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
@@ -399,7 +399,7 @@ export default function Home() {
                 {/* Location */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl p-5 md:p-7"
+                  className="rounded-2xl p-6 md:p-8"
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>

@@ -171,13 +171,13 @@ export default function Diploma() {
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="rounded-3xl p-6 md:p-10"
+                className="rounded-3xl p-7 md:p-11"
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}
               >
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
                   <div>
                     <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#f5f5f7' }}>{job.company}</h3>
                     <p className="text-base font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{job.role}</p>
@@ -188,9 +188,9 @@ export default function Diploma() {
                     {job.period}
                   </span>
                 </div>
-                <ul className="flex flex-col gap-2 mb-6">
+                <ul className="flex flex-col gap-3 mb-8">
                   {job.bullets.map((b, j) => (
-                    <li key={j} className="flex gap-2 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <li key={j} className="flex gap-3 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
                       <span style={{ color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>·</span>
                       {b}
                     </li>

@@ -68,20 +68,20 @@ export default function Projects() {
             style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '60px' }}
           />
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             {projects.map((project) => (
               <motion.div
                 key={project.title}
                 variants={fadeUp}
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="rounded-3xl p-6 md:p-10"
+                className="rounded-3xl p-7 md:p-11"
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}
               >
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1.5">
@@ -103,7 +103,7 @@ export default function Projects() {
                   </span>
                 </div>
 
-                <p className="text-sm leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   {project.description}
                 </p>
 
