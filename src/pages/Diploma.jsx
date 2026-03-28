@@ -91,9 +91,61 @@ function SectionDivider() {
   )
 }
 
+function TimelineDot({ glowing = false }) {
+  return (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: '20px', height: '20px', marginTop: '2px' }}>
+      {glowing && (
+        <div style={{
+          position: 'absolute', width: '20px', height: '20px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(140,100,255,0.35) 0%, transparent 70%)',
+          animation: 'pulse-dot 2.4s ease-in-out infinite',
+        }} />
+      )}
+      <div style={{
+        width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0,
+        background: glowing ? 'rgba(160,130,255,0.9)' : 'rgba(255,255,255,0.25)',
+        border: glowing ? '1px solid rgba(180,160,255,0.5)' : '1px solid rgba(255,255,255,0.15)',
+        boxShadow: glowing ? '0 0 10px rgba(140,100,255,0.6)' : 'none',
+      }} />
+    </div>
+  )
+}
+
+function TimelineSection({ items, renderCard, isLast = false }) {
+  return (
+    <div style={{ position: 'relative', paddingLeft: '36px' }}>
+      {/* vertical line */}
+      <div style={{
+        position: 'absolute', left: '9px', top: '20px',
+        bottom: isLast ? 'auto' : '0',
+        height: isLast ? 'calc(100% - 20px)' : undefined,
+        width: '1px',
+        background: 'linear-gradient(to bottom, rgba(140,100,255,0.3), rgba(255,255,255,0.05) 80%, transparent)',
+      }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {items.map((item, i) => (
+          <motion.div key={i} variants={fadeUp} style={{ position: 'relative' }}>
+            {/* dot */}
+            <div style={{ position: 'absolute', left: '-36px', top: '2px' }}>
+              <TimelineDot glowing={i === 0} />
+            </div>
+            {renderCard(item, i)}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Diploma() {
   return (
     <main style={{ minHeight: '100vh', paddingTop: '100px', paddingBottom: '80px', paddingLeft: '24px', paddingRight: '24px' }}>
+      <style>{`
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.4); }
+        }
+      `}</style>
       <div style={{ maxWidth: '768px', margin: '0 auto' }}>
         <motion.div initial="hidden" animate="show" variants={stagger} style={{ width: '100%' }}>
 
@@ -124,17 +176,15 @@ export default function Diploma() {
             style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '60px' }}
           />
 
-          {/* ── Education ── */}
+          {/* ── Education Timeline ── */}
           <SectionLabel>Education</SectionLabel>
-          <div className="flex flex-col gap-4">
-            {education.map((edu, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          <TimelineSection
+            items={education}
+            isLast
+            renderCard={(edu) => (
+              <div
                 className="rounded-3xl"
-                style={{ padding: '40px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ padding: '36px 40px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                   <div>
@@ -156,27 +206,21 @@ export default function Diploma() {
                     </span>
                   ))}
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            )}
+          />
 
           <SectionDivider />
 
-          {/* ── Work Experience ── */}
+          {/* ── Work Experience Timeline ── */}
           <SectionLabel>Work Experience</SectionLabel>
-          <div className="flex flex-col gap-4">
-            {workExperience.map((job, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          <TimelineSection
+            items={workExperience}
+            isLast
+            renderCard={(job) => (
+              <div
                 className="rounded-3xl"
-                style={{
-                  padding: '44px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                }}
+                style={{ padding: '36px 40px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
                   <div>
@@ -192,7 +236,7 @@ export default function Diploma() {
                 <ul className="flex flex-col gap-3 mb-8">
                   {job.bullets.map((b, j) => (
                     <li key={j} className="flex gap-3 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      <span style={{ color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>·</span>
+                      <span style={{ color: 'rgba(160,130,255,0.5)', flexShrink: 0, marginTop: '2px' }}>▸</span>
                       {b}
                     </li>
                   ))}
@@ -205,9 +249,9 @@ export default function Diploma() {
                     </span>
                   ))}
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            )}
+          />
 
           <SectionDivider />
 
