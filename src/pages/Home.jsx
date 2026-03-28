@@ -115,7 +115,7 @@ function CountUp({ to, suffix = '' }) {
 function MarqueeRow({ items, reverse = false, speed = 22 }) {
   const doubled = [...items, ...items]
   return (
-    <div style={{ overflow: 'hidden', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+    <div style={{ overflow: 'hidden', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
       <div style={{
         display: 'flex', gap: '32px', width: 'max-content',
         animation: `${reverse ? 'marquee-right' : 'marquee-left'} ${speed}s linear infinite`,

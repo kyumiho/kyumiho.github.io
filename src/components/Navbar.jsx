@@ -94,7 +94,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)' }}
+            style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
             className="md:hidden border-t border-white/8"
           >
             <div className="px-6 py-4 flex flex-col gap-1">
