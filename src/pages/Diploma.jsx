@@ -93,7 +93,7 @@ function SectionDivider() {
 
 export default function Diploma() {
   return (
-    <main className="min-h-screen flex items-center py-20 md:py-28 px-6">
+    <main style={{ minHeight: '100vh', paddingTop: '100px', paddingBottom: '80px', paddingLeft: '24px', paddingRight: '24px' }}>
       <div style={{ maxWidth: '768px', margin: '0 auto' }}>
         <motion.div initial="hidden" animate="show" variants={stagger} style={{ width: '100%' }}>
 
