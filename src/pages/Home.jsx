@@ -139,7 +139,7 @@ export default function Home() {
 
           <motion.h1
             variants={fadeUp}
-            className="text-6xl md:text-8xl font-bold tracking-tight"
+            className="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight"
             style={{ color: '#f5f5f7', letterSpacing: '-0.03em', lineHeight: 1.05 }}
           >
             SeongRok Ha
@@ -174,7 +174,7 @@ export default function Home() {
       </section>
 
       {/* ── Languages ── */}
-      <section className="py-36 px-6">
+      <section className="py-16 md:py-36 px-6">
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div
             initial="hidden"
@@ -196,7 +196,7 @@ export default function Home() {
             >
               What I Code With.
             </motion.h2>
-            <motion.div variants={stagger} className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 gap-3">
+            <motion.div variants={stagger} className="grid grid-cols-3 sm:grid-cols-6 gap-3">
               {languages.map((lang, i) => (
                 <TechCard key={lang.name} {...lang} index={i} />
               ))}
@@ -211,7 +211,7 @@ export default function Home() {
       </div>
 
       {/* ── Tools ── */}
-      <section className="py-36 px-6" style={{ paddingTop: '100px', paddingBottom: '120px' }}>
+      <section className="py-16 md:py-28 px-6">
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div
             initial="hidden"
@@ -233,7 +233,7 @@ export default function Home() {
             >
               My Toolbox.
             </motion.h2>
-            <motion.div variants={stagger} className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 gap-3">
+            <motion.div variants={stagger} className="grid grid-cols-3 sm:grid-cols-6 gap-3">
               {tools.map((tool, i) => (
                 <TechCard key={tool.name} {...tool} index={i} />
               ))}
@@ -273,8 +273,8 @@ export default function Home() {
 
             <motion.div
               variants={fadeUp}
-              style={{ height: '72px' }}
-              className="flex items-center justify-center overflow-hidden"
+              style={{ minHeight: '90px' }}
+              className="flex items-center justify-center"
             >
               <AnimatePresence mode="wait">
                 <motion.span
@@ -283,7 +283,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -32 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-4xl md:text-5xl font-bold block"
+                  className="text-3xl md:text-5xl font-bold block"
                   style={{ color: '#f5f5f7', letterSpacing: '-0.025em' }}
                 >
                   {positions[posIndex]}
@@ -315,7 +315,7 @@ export default function Home() {
       </div>
 
       {/* ── About / Bio ── */}
-      <section className="px-6" style={{ paddingTop: '50px', paddingBottom: '128px' }}>
+      <section className="px-6 pt-12 pb-16 md:pb-32">
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div
             initial="hidden"
@@ -342,8 +342,8 @@ export default function Home() {
               {/* Bio */}
               <motion.div
                 variants={fadeUp}
-                className="rounded-3xl"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '35px' }}
+                className="rounded-3xl p-6 md:p-9"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <p className="text-sm leading-7" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   I'm a{' '}
@@ -366,8 +366,8 @@ export default function Home() {
                 {/* AI Agent */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl"
-                  style={{ padding: '27px', background: 'rgba(120,80,255,0.07)', border: '1px solid rgba(120,80,255,0.18)' }}
+                  className="rounded-2xl p-5 md:p-7"
+                  style={{ background: 'rgba(120,80,255,0.07)', border: '1px solid rgba(120,80,255,0.18)' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: 'rgba(180,160,255,0.55)' }}>
                     AI Agent Proficiency
@@ -382,8 +382,8 @@ export default function Home() {
                 {/* Current Role */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl"
-                  style={{ padding: '27px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                  className="rounded-2xl p-5 md:p-7"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
                     Current Role
@@ -399,8 +399,8 @@ export default function Home() {
                 {/* Location */}
                 <motion.div
                   variants={fadeUp}
-                  className="rounded-2xl"
-                  style={{ padding: '27px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                  className="rounded-2xl p-5 md:p-7"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
                   <p className="text-xs font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.22)', marginBottom: '10px' }}>
                     Location

@@ -66,7 +66,7 @@ export default function Contact() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', paddingTop: '80px', paddingBottom: '80px', paddingLeft: '24px', paddingRight: '24px' }}>
+    <main className="min-h-screen flex items-center py-16 md:py-20 px-6">
       <div style={{ maxWidth: '768px', margin: '0 auto', width: '100%' }}>
         <motion.div initial="hidden" animate="show" variants={stagger}>
           <motion.p
@@ -85,7 +85,7 @@ export default function Contact() {
           </motion.h1>
           <motion.p
             variants={fadeUp}
-            className="text-center text-lg mb-20"
+            className="text-center text-lg mb-10 md:mb-20"
             style={{ color: 'rgba(255,255,255,0.35)' }}
           >
             Have a question? I'd love to hear from you.

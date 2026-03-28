@@ -85,7 +85,7 @@ export default function Footer() {
           </div>
 
           {/* Center — nav links */}
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
             {links.map(({ to, label }) => (
               <Link
                 key={to}
