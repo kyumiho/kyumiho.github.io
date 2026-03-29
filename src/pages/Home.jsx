@@ -85,12 +85,12 @@ function TechCard({ name, icon, iconEl, index }) {
       whileHover={{ scale: 1.05, y: -4 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className="flex flex-col items-center gap-2.5 p-4 rounded-2xl cursor-default"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+      style={{ background: 'var(--clr-surface)', border: '1px solid var(--clr-stat-border)' }}
     >
       {iconEl
         ? <div className="w-9 h-9 flex items-center justify-center">{iconEl}</div>
         : <img src={icon} alt={name} className="w-9 h-9 object-contain" />}
-      <span className="text-xs text-white/40 text-center leading-tight">{name}</span>
+      <span className="text-xs text-center leading-tight" style={{ color: 'var(--clr-text-3)' }}>{name}</span>
     </motion.div>
   )
 }
@@ -129,11 +129,11 @@ function MarqueeRow({ items, reverse = false, speed = 22 }) {
               fontWeight: 500,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.18)',
+              color: 'var(--clr-marquee-item)',
               padding: '6px 16px',
               borderRadius: '100px',
-              border: '1px solid rgba(255,255,255,0.06)',
-              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid var(--clr-marquee-border)',
+              background: 'var(--clr-marquee-bg)',
             }}
           >
             {item}
@@ -165,15 +165,15 @@ export default function Home() {
           />
         </div>
         <motion.div initial="hidden" animate="show" variants={stagger} className="relative z-10 flex flex-col items-center gap-6 max-w-3xl">
-          <motion.p variants={fadeUp} className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <motion.p variants={fadeUp} className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: 'var(--clr-text-3)' }}>
             Software Engineer
           </motion.p>
-          <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight" style={{ color: '#f5f5f7', letterSpacing: '-0.03em', lineHeight: 1.05 }}>
+          <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight" style={{ color: 'var(--clr-text-1)', letterSpacing: '-0.03em', lineHeight: 1.05 }}>
             SeongRok Ha
             <br />
-            <span style={{ color: 'rgba(245,245,247,0.45)' }}>Simon.</span>
+            <span style={{ color: 'var(--clr-hero-sub)' }}>Simon.</span>
           </motion.h1>
-          <motion.p variants={fadeUp} className="text-lg md:text-xl max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          <motion.p variants={fadeUp} className="text-lg md:text-xl max-w-xl leading-relaxed" style={{ color: 'var(--clr-hero-desc)' }}>
             CS&E graduate from The Ohio State University.
             From South Korea — passionate about building great software.
           </motion.p>
@@ -183,7 +183,7 @@ export default function Home() {
           className="absolute bottom-10 left-1/2 -translate-x-1/2"
         >
           <motion.div animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-            className="w-px h-10" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}
+            className="w-px h-10" style={{ background: 'linear-gradient(to bottom, var(--clr-text-4), transparent)' }}
           />
         </motion.div>
       </section>
@@ -198,12 +198,12 @@ export default function Home() {
             {stats.map((s, i) => (
               <motion.div
                 key={i} variants={fadeUp}
-                style={{ textAlign: 'center', padding: '32px 16px', borderRadius: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ textAlign: 'center', padding: '32px 16px', borderRadius: '20px', background: 'var(--clr-stat-bg)', border: '1px solid var(--clr-stat-border)' }}
               >
-                <p style={{ fontSize: '2.5rem', fontWeight: 700, color: '#f5f5f7', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                <p style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--clr-text-1)', letterSpacing: '-0.03em', lineHeight: 1 }}>
                   <CountUp to={s.value} suffix={s.suffix} />
                 </p>
-                <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginTop: '10px' }}>
+                <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--clr-text-4)', marginTop: '10px' }}>
                   {s.label}
                 </p>
               </motion.div>
@@ -217,11 +217,11 @@ export default function Home() {
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: false, margin: '-80px' }} variants={stagger}>
             <motion.p variants={fadeUp} className="text-center text-xs font-medium tracking-[0.2em] uppercase"
-              style={{ color: 'rgba(255,255,255,0.25)', marginTop: '10px', marginBottom: '10px' }}>
+              style={{ color: 'var(--clr-text-4)', marginTop: '10px', marginBottom: '10px' }}>
               Languages
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-center text-4xl md:text-5xl font-bold"
-              style={{ color: '#f5f5f7', letterSpacing: '-0.025em', marginBottom: '50px' }}>
+              style={{ color: 'var(--clr-text-1)', letterSpacing: '-0.025em', marginBottom: '50px' }}>
               What I Code With.
             </motion.h2>
             <motion.div variants={stagger} className="grid grid-cols-3 sm:grid-cols-6 gap-3">
@@ -233,7 +233,7 @@ export default function Home() {
 
       {/* Divider */}
       <div style={{ maxWidth: '896px', margin: '0 auto', paddingTop: '24px', paddingBottom: '5px', paddingLeft: '24px', paddingRight: '24px' }}>
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+        <div style={{ height: '1px', background: 'var(--clr-divider)' }} />
       </div>
 
       {/* ── Tools ── */}
@@ -241,11 +241,11 @@ export default function Home() {
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: false, margin: '-80px' }} variants={stagger}>
             <motion.p variants={fadeUp} className="text-center text-xs font-medium tracking-[0.2em] uppercase"
-              style={{ color: 'rgba(255,255,255,0.25)', marginTop: '10px', marginBottom: '10px' }}>
+              style={{ color: 'var(--clr-text-4)', marginTop: '10px', marginBottom: '10px' }}>
               Tools & Technologies
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-center text-4xl md:text-5xl font-bold"
-              style={{ color: '#f5f5f7', letterSpacing: '-0.025em', marginBottom: '50px' }}>
+              style={{ color: 'var(--clr-text-1)', letterSpacing: '-0.025em', marginBottom: '50px' }}>
               My Toolbox.
             </motion.h2>
             <motion.div variants={stagger} className="grid grid-cols-3 sm:grid-cols-6 gap-3">
@@ -265,17 +265,17 @@ export default function Home() {
 
       {/* Divider */}
       <div style={{ maxWidth: '896px', margin: '0 auto', paddingTop: '24px', paddingBottom: '5px', paddingLeft: '24px', paddingRight: '24px' }}>
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+        <div style={{ height: '1px', background: 'var(--clr-divider)' }} />
       </div>
 
       {/* ── Position Slideshow ── */}
       <section className="px-6" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
         <div style={{ maxWidth: '896px', margin: '0 auto' }} className="text-center">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: false, margin: '-80px' }} variants={stagger}>
-            <motion.p variants={fadeUp} className="text-xs font-medium tracking-[0.2em] uppercase mb-4" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <motion.p variants={fadeUp} className="text-xs font-medium tracking-[0.2em] uppercase mb-4" style={{ color: 'var(--clr-text-4)' }}>
               Open To
             </motion.p>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-semibold mb-8" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.02em' }}>
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-semibold mb-8" style={{ color: 'var(--clr-hero-desc)', letterSpacing: '-0.02em' }}>
               I'm looking for a role as
             </motion.h2>
             <motion.div variants={fadeUp} style={{ minHeight: '90px' }} className="flex items-center justify-center">
@@ -285,7 +285,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -32 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className="text-3xl md:text-5xl font-bold block"
-                  style={{ color: '#f5f5f7', letterSpacing: '-0.025em' }}
+                  style={{ color: 'var(--clr-text-1)', letterSpacing: '-0.025em' }}
                 >
                   {positions[posIndex]}
                 </motion.span>
@@ -294,7 +294,7 @@ export default function Home() {
             <motion.div variants={fadeUp} className="flex items-center justify-center gap-2 mt-8">
               {positions.map((_, i) => (
                 <button key={i} onClick={() => setPosIndex(i)} className="rounded-full transition-all duration-300"
-                  style={{ width: i === posIndex ? '24px' : '6px', height: '6px', background: i === posIndex ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)' }} />
+                  style={{ width: i === posIndex ? '24px' : '6px', height: '6px', background: i === posIndex ? 'var(--clr-dot-active)' : 'var(--clr-dot-inactive)' }} />
               ))}
             </motion.div>
           </motion.div>
@@ -303,18 +303,18 @@ export default function Home() {
 
       {/* Divider */}
       <div style={{ maxWidth: '896px', margin: '0 auto', padding: '5px 24px' }}>
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+        <div style={{ height: '1px', background: 'var(--clr-divider)' }} />
       </div>
 
       {/* ── About / Bento ── */}
       <section className="px-6" style={{ paddingTop: '48px', paddingBottom: '160px' }}>
         <div style={{ maxWidth: '896px', margin: '0 auto' }}>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: false, margin: '-80px' }} variants={stagger}>
-            <motion.p variants={fadeUp} className="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <motion.p variants={fadeUp} className="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center" style={{ color: 'var(--clr-text-4)' }}>
               About
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold text-center"
-              style={{ color: '#f5f5f7', letterSpacing: '-0.025em', marginBottom: '32px' }}>
+              style={{ color: 'var(--clr-text-1)', letterSpacing: '-0.025em', marginBottom: '32px' }}>
               Who am I?
             </motion.h2>
 
@@ -325,27 +325,27 @@ export default function Home() {
               <motion.div
                 variants={fadeUp}
                 className="rounded-3xl"
-                style={{ gridRow: 'span 2', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '44px' }}
+                style={{ gridRow: 'span 2', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)', padding: '44px' }}
               >
-                <p className="text-xs font-medium tracking-widest uppercase mb-5" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                <p className="text-xs font-medium tracking-widest uppercase mb-5" style={{ color: 'var(--clr-text-5)' }}>
                   Bio
                 </p>
-                <p className="text-sm leading-7" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="text-sm leading-7" style={{ color: 'var(--clr-text-2)' }}>
                   I'm a{' '}
-                  <span style={{ color: 'rgba(255,255,255,0.85)' }}>Computer Science & Engineering</span>{' '}
+                  <span style={{ color: 'var(--clr-text-1)' }}>Computer Science & Engineering</span>{' '}
                   graduate from{' '}
-                  <span style={{ color: 'rgba(255,255,255,0.85)' }}>The Ohio State University</span>{' '}
+                  <span style={{ color: 'var(--clr-text-1)' }}>The Ohio State University</span>{' '}
                   (May 2023), specializing in Software Engineering. Currently working as an{' '}
-                  <span style={{ color: 'rgba(255,255,255,0.85)' }}>Lead Business System Analyst</span>{' '}
+                  <span style={{ color: 'var(--clr-text-1)' }}>Lead Business System Analyst</span>{' '}
                   at SK Battery America, designing and implementing Manufacturing Execution System processes.
                 </p>
-                <p className="text-sm leading-7 mt-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="text-sm leading-7 mt-6" style={{ color: 'var(--clr-text-2)' }}>
                   With hands-on experience in full-stack development — React, Python, Java, Django, Ruby on Rails — and a
                   background in Agile methodologies and OOP, I bridge technical depth with business-oriented thinking.
                   I thrive in roles where software meets strategy.
                 </p>
-                <div style={{ marginTop: '32px', paddingTop: '28px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.2)', letterSpacing: '0.08em' }}>
+                <div style={{ marginTop: '32px', paddingTop: '28px', borderTop: '1px solid var(--clr-divider)' }}>
+                  <p className="text-xs" style={{ color: 'var(--clr-text-5)', letterSpacing: '0.08em' }}>
                     🇰🇷 From South Korea &nbsp;·&nbsp; 📍 Duluth, GA &nbsp;·&nbsp; 🌐 Open to Remote
                   </p>
                 </div>
@@ -355,14 +355,14 @@ export default function Home() {
               <motion.div
                 variants={fadeUp}
                 className="rounded-2xl"
-                style={{ background: 'rgba(120,80,255,0.07)', border: '1px solid rgba(120,80,255,0.18)', padding: '32px' }}
+                style={{ background: 'var(--clr-accent-bg)', border: '1px solid var(--clr-accent-border)', padding: '32px' }}
               >
-                <p className="text-xs font-medium tracking-widest uppercase mb-3" style={{ color: 'rgba(180,160,255,0.55)' }}>
+                <p className="text-xs font-medium tracking-widest uppercase mb-3" style={{ color: 'var(--clr-accent-text)' }}>
                   AI Agent Proficiency
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--clr-text-2)' }}>
                   I actively leverage AI agents like{' '}
-                  <span style={{ color: 'rgba(200,180,255,0.9)' }}>Claude Code</span>{' '}
+                  <span style={{ color: 'var(--clr-accent-hl)' }}>Claude Code</span>{' '}
                   to accelerate development and stay ahead of how modern software gets built.
                 </p>
               </motion.div>
@@ -371,18 +371,18 @@ export default function Home() {
               <motion.div
                 variants={fadeUp}
                 className="rounded-2xl"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '32px' }}
+                style={{ background: 'var(--clr-surface)', border: '1px solid var(--clr-border)', padding: '32px' }}
               >
-                <p className="text-xs font-medium tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.22)' }}>
+                <p className="text-xs font-medium tracking-widest uppercase mb-3" style={{ color: 'var(--clr-text-5)' }}>
                   Current Role
                 </p>
-                <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                <p className="text-sm font-semibold mb-1" style={{ color: 'var(--clr-text-1)' }}>
                   Lead Business System Analyst
                 </p>
-                <p className="text-xs mb-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <p className="text-xs mb-0.5" style={{ color: 'var(--clr-text-3)' }}>
                   SK Battery America
                 </p>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                <p className="text-xs" style={{ color: 'var(--clr-text-4)' }}>
                   Sep 2023 – Present
                 </p>
               </motion.div>

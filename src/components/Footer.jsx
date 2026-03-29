@@ -50,33 +50,33 @@ export default function Footer() {
   const { pathname } = useLocation()
 
   return (
-    <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+    <footer style={{ borderTop: '1px solid var(--clr-border)' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 24px' }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
 
           {/* Left — info */}
           <div className="flex flex-col items-center md:items-start gap-1 text-center md:text-left">
-            <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <p className="text-sm font-medium" style={{ color: 'var(--clr-text-2)' }}>
               SeongRok Ha (Simon) Ha
             </p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-xs" style={{ color: 'var(--clr-text-4)' }}>
               The Ohio State University · Computer Science & Engineering
             </p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-xs" style={{ color: 'var(--clr-text-4)' }}>
               Graduated 2023
             </p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.18)' }}>
+            <p className="text-xs" style={{ color: 'var(--clr-text-5)' }}>
               © {new Date().getFullYear()} lahel97@gmail.com
             </p>
-            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.14)' }}>
+            <p className="text-xs mt-1" style={{ color: 'var(--clr-text-6)' }}>
               Built with{' '}
               <a
                 href="https://claude.ai/code"
                 target="_blank"
                 rel="noreferrer"
-                style={{ color: 'rgba(180,160,255,0.5)' }}
-                onMouseEnter={e => e.currentTarget.style.color = 'rgba(180,160,255,0.9)'}
-                onMouseLeave={e => e.currentTarget.style.color = 'rgba(180,160,255,0.5)'}
+                style={{ color: 'var(--clr-footer-link)' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--clr-footer-link-hover)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--clr-footer-link)'}
                 className="transition-colors duration-200"
               >
                 Claude Code
@@ -91,9 +91,9 @@ export default function Footer() {
                 key={to}
                 to={to}
                 className="text-xs transition-colors duration-200"
-                style={{ color: pathname === to ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)' }}
-                onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
-                onMouseLeave={e => e.currentTarget.style.color = pathname === to ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'}
+                style={{ color: pathname === to ? 'var(--clr-text-2)' : 'var(--clr-text-4)' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--clr-text-2)'}
+                onMouseLeave={e => e.currentTarget.style.color = pathname === to ? 'var(--clr-text-2)' : 'var(--clr-text-4)'}
               >
                 {label}
               </Link>
@@ -109,9 +109,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={s.label}
-                style={{ color: 'rgba(255,255,255,0.25)' }}
-                onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
-                onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.25)'}
+                style={{ color: 'var(--clr-social)' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--clr-social-hover)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--clr-social)'}
                 className="transition-colors duration-200"
               >
                 {s.icon}

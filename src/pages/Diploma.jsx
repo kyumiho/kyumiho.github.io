@@ -75,7 +75,7 @@ function SectionLabel({ children }) {
     <motion.p
       variants={fadeUp}
       className="text-xs font-medium tracking-[0.2em] uppercase"
-      style={{ color: 'rgba(255,255,255,0.2)', marginBottom: '19px' }}
+      style={{ color: 'var(--clr-text-5)', marginBottom: '19px' }}
     >
       {children}
     </motion.p>
@@ -86,7 +86,7 @@ function SectionDivider() {
   return (
     <motion.div
       variants={fadeUp}
-      style={{ height: '1px', background: 'rgba(255,255,255,0.06)', marginTop: '60px', marginBottom: '60px' }}
+      style={{ height: '1px', background: 'var(--clr-divider)', marginTop: '60px', marginBottom: '60px' }}
     />
   )
 }
@@ -103,9 +103,9 @@ function TimelineDot({ glowing = false }) {
       )}
       <div style={{
         width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0,
-        background: glowing ? 'rgba(160,130,255,0.9)' : 'rgba(255,255,255,0.25)',
-        border: glowing ? '1px solid rgba(180,160,255,0.5)' : '1px solid rgba(255,255,255,0.15)',
-        boxShadow: glowing ? '0 0 10px rgba(140,100,255,0.6)' : 'none',
+        background: glowing ? 'var(--clr-timeline-dot)' : 'var(--clr-text-4)',
+        border: glowing ? '1px solid var(--clr-timeline-dot-b)' : '1px solid rgba(255,255,255,0.15)',
+        boxShadow: glowing ? '0 0 10px var(--clr-timeline-glow)' : 'none',
       }} />
     </div>
   )
@@ -120,7 +120,7 @@ function TimelineSection({ items, renderCard, isLast = false }) {
         bottom: isLast ? 'auto' : '0',
         height: isLast ? 'calc(100% - 20px)' : undefined,
         width: '1px',
-        background: 'linear-gradient(to bottom, rgba(140,100,255,0.3), rgba(255,255,255,0.05) 80%, transparent)',
+        background: 'var(--clr-timeline-line)',
       }} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
         {items.map((item, i) => (
@@ -153,27 +153,27 @@ export default function Diploma() {
           <motion.p
             variants={fadeUp}
             className="text-xs font-medium tracking-[0.2em] uppercase text-center"
-            style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '20px' }}
+            style={{ color: 'var(--clr-text-4)', marginBottom: '20px' }}
           >
             Education & Experience
           </motion.p>
           <motion.h1
             variants={fadeUp}
             className="text-5xl md:text-7xl font-bold text-center"
-            style={{ color: '#f5f5f7', letterSpacing: '-0.03em', marginBottom: '16px' }}
+            style={{ color: 'var(--clr-text-1)', letterSpacing: '-0.03em', marginBottom: '16px' }}
           >
             Diploma.
           </motion.h1>
           <motion.p
             variants={fadeUp}
             className="text-center text-lg"
-            style={{ color: 'rgba(255,255,255,0.35)', marginBottom: '40px' }}
+            style={{ color: 'var(--clr-text-3)', marginBottom: '40px' }}
           >
             My academic background and work experience.
           </motion.p>
           <motion.div
             variants={fadeUp}
-            style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '60px' }}
+            style={{ height: '1px', background: 'var(--clr-border)', marginBottom: '60px' }}
           />
 
           {/* ── Education Timeline ── */}
@@ -184,24 +184,24 @@ export default function Diploma() {
             renderCard={(edu) => (
               <div
                 className="rounded-3xl"
-                style={{ padding: '36px 40px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ padding: '36px 40px', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)' }}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#f5f5f7' }}>{edu.degree}</h3>
-                    <p className="text-base font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{edu.school}</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>{edu.location}</p>
+                    <h3 className="text-xl font-semibold mb-1.5" style={{ color: 'var(--clr-text-1)' }}>{edu.degree}</h3>
+                    <p className="text-base font-medium mb-0.5" style={{ color: 'var(--clr-text-2)' }}>{edu.school}</p>
+                    <p className="text-xs" style={{ color: 'var(--clr-period)' }}>{edu.location}</p>
                   </div>
                   <span className="shrink-0 px-3 py-1 rounded-full text-xs font-mono self-start"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                    style={{ background: 'var(--clr-period-bg)', color: 'var(--clr-period)' }}>
                     {edu.period}
                   </span>
                 </div>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{edu.description}</p>
+                <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--clr-text-3)' }}>{edu.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {edu.tags.map(tag => (
                     <span key={tag} className="px-3 py-1 rounded-full text-xs"
-                      style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
+                      style={{ background: 'var(--clr-tag-bg)', color: 'var(--clr-tag)' }}>
                       {tag}
                     </span>
                   ))}
@@ -220,23 +220,23 @@ export default function Diploma() {
             renderCard={(job) => (
               <div
                 className="rounded-3xl"
-                style={{ padding: '36px 40px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ padding: '36px 40px', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)' }}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#f5f5f7' }}>{job.company}</h3>
-                    <p className="text-base font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{job.role}</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>{job.location}</p>
+                    <h3 className="text-xl font-semibold mb-1.5" style={{ color: 'var(--clr-text-1)' }}>{job.company}</h3>
+                    <p className="text-base font-medium mb-0.5" style={{ color: 'var(--clr-text-2)' }}>{job.role}</p>
+                    <p className="text-xs" style={{ color: 'var(--clr-period)' }}>{job.location}</p>
                   </div>
                   <span className="shrink-0 px-3 py-1 rounded-full text-xs font-mono self-start"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                    style={{ background: 'var(--clr-period-bg)', color: 'var(--clr-period)' }}>
                     {job.period}
                   </span>
                 </div>
                 <ul className="flex flex-col gap-3 mb-8">
                   {job.bullets.map((b, j) => (
-                    <li key={j} className="flex gap-3 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      <span style={{ color: 'rgba(160,130,255,0.5)', flexShrink: 0, marginTop: '2px' }}>▸</span>
+                    <li key={j} className="flex gap-3 text-sm leading-relaxed" style={{ color: 'var(--clr-text-3)' }}>
+                      <span style={{ color: 'var(--clr-bullet)', flexShrink: 0, marginTop: '2px' }}>▸</span>
                       {b}
                     </li>
                   ))}
@@ -244,7 +244,7 @@ export default function Diploma() {
                 <div className="flex flex-wrap gap-2">
                   {job.tags.map(tag => (
                     <span key={tag} className="px-3 py-1 rounded-full text-xs"
-                      style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
+                      style={{ background: 'var(--clr-tag-bg)', color: 'var(--clr-tag)' }}>
                       {tag}
                     </span>
                   ))}
@@ -265,22 +265,22 @@ export default function Diploma() {
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 className="rounded-2xl"
-                style={{ padding: '28px 32px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ padding: '28px 32px', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)' }}
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
                   <div>
-                    <h3 className="text-base font-semibold mb-0.5" style={{ color: '#f5f5f7' }}>{cert.name}</h3>
-                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{cert.issuer}</p>
+                    <h3 className="text-base font-semibold mb-0.5" style={{ color: 'var(--clr-text-1)' }}>{cert.name}</h3>
+                    <p className="text-sm" style={{ color: 'var(--clr-text-3)' }}>{cert.issuer}</p>
                   </div>
                   <span className="shrink-0 px-3 py-1 rounded-full text-xs font-mono self-start"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                    style={{ background: 'var(--clr-period-bg)', color: 'var(--clr-period)' }}>
                     {cert.issued}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {cert.tags.map(tag => (
                     <span key={tag} className="px-2.5 py-1 rounded-full text-xs"
-                      style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
+                      style={{ background: 'var(--clr-tag-bg)', color: 'var(--clr-tag)' }}>
                       {tag}
                     </span>
                   ))}
@@ -301,14 +301,14 @@ export default function Diploma() {
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 className="rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3"
-                style={{ padding: '28px 32px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ padding: '28px 32px', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)' }}
               >
                 <div>
-                  <h3 className="text-base font-semibold mb-0.5" style={{ color: '#f5f5f7' }}>{h.title}</h3>
-                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{h.issuer}</p>
+                  <h3 className="text-base font-semibold mb-0.5" style={{ color: 'var(--clr-text-1)' }}>{h.title}</h3>
+                  <p className="text-sm" style={{ color: 'var(--clr-text-3)' }}>{h.issuer}</p>
                 </div>
                 <span className="shrink-0 px-3 py-1 rounded-full text-xs font-mono self-start"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                  style={{ background: 'var(--clr-period-bg)', color: 'var(--clr-period)' }}>
                   {h.issued}
                 </span>
               </motion.div>
@@ -327,21 +327,21 @@ export default function Diploma() {
                 whileHover={{ scale: 1.01 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 className="rounded-2xl"
-                style={{ padding: '28px 32px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ padding: '28px 32px', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)' }}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-2">
                   <div>
-                    <h3 className="text-base font-semibold mb-0.5" style={{ color: '#f5f5f7' }}>{org.name}</h3>
-                    <p className="text-sm mb-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{org.role}</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>{org.affiliation}</p>
+                    <h3 className="text-base font-semibold mb-0.5" style={{ color: 'var(--clr-text-1)' }}>{org.name}</h3>
+                    <p className="text-sm mb-0.5" style={{ color: 'var(--clr-text-2)' }}>{org.role}</p>
+                    <p className="text-xs" style={{ color: 'var(--clr-period)' }}>{org.affiliation}</p>
                   </div>
                   <span className="shrink-0 px-3 py-1 rounded-full text-xs font-mono self-start"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                    style={{ background: 'var(--clr-period-bg)', color: 'var(--clr-period)' }}>
                     {org.period}
                   </span>
                 </div>
                 {org.description && (
-                  <p className="text-sm leading-relaxed mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <p className="text-sm leading-relaxed mt-2" style={{ color: 'var(--clr-text-3)' }}>
                     {org.description}
                   </p>
                 )}

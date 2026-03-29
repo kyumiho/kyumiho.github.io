@@ -2,6 +2,132 @@
 
 @import "tailwindcss";
 
+/* ── Theme tokens ─────────────────────────────────── */
+:root {
+  /* Dark (default) */
+  --clr-bg:               #000;
+  --clr-surface:          rgba(255,255,255,0.04);
+  --clr-border:           rgba(255,255,255,0.07);
+  --clr-divider:          rgba(255,255,255,0.06);
+  --clr-text-1:           #f5f5f7;
+  --clr-text-2:           rgba(255,255,255,0.55);
+  --clr-text-3:           rgba(255,255,255,0.38);
+  --clr-text-4:           rgba(255,255,255,0.25);
+  --clr-text-5:           rgba(255,255,255,0.2);
+  --clr-text-6:           rgba(255,255,255,0.14);
+  --clr-tag-bg:           rgba(255,255,255,0.07);
+  --clr-tag:              rgba(255,255,255,0.45);
+  --clr-period-bg:        rgba(255,255,255,0.06);
+  --clr-period:           rgba(255,255,255,0.3);
+  --clr-badge-bg:         rgba(120,80,255,0.15);
+  --clr-badge-border:     rgba(120,80,255,0.2);
+  --clr-badge:            rgba(180,160,255,0.7);
+  --clr-accent-bg:        rgba(120,80,255,0.07);
+  --clr-accent-border:    rgba(120,80,255,0.18);
+  --clr-accent-text:      rgba(180,160,255,0.55);
+  --clr-accent-hl:        rgba(200,180,255,0.9);
+  --clr-bullet:           rgba(160,130,255,0.5);
+  --clr-nav-bg:           rgba(0,0,0,0.72);
+  --clr-nav-border:       rgba(255,255,255,0.08);
+  --clr-nav-link:         rgba(255,255,255,0.6);
+  --clr-nav-active-bg:    rgba(255,255,255,0.1);
+  --clr-hero-sub:         rgba(245,245,247,0.45);
+  --clr-hero-desc:        rgba(255,255,255,0.45);
+  --clr-link:             rgba(255,255,255,0.35);
+  --clr-link-hover:       rgba(255,255,255,0.8);
+  --clr-social:           rgba(255,255,255,0.25);
+  --clr-social-hover:     rgba(255,255,255,0.7);
+  --clr-footer-link:      rgba(180,160,255,0.5);
+  --clr-footer-link-hover:rgba(180,160,255,0.9);
+  --clr-stat-bg:          rgba(255,255,255,0.03);
+  --clr-stat-border:      rgba(255,255,255,0.06);
+  --clr-marquee-item:     rgba(255,255,255,0.18);
+  --clr-marquee-bg:       rgba(255,255,255,0.02);
+  --clr-marquee-border:   rgba(255,255,255,0.06);
+  --clr-input-bg:         rgba(255,255,255,0.04);
+  --clr-input-border:     rgba(255,255,255,0.08);
+  --clr-btn:              rgba(255,255,255,0.1);
+  --clr-btn-border:       rgba(255,255,255,0.1);
+  --clr-noise-opacity:    0.035;
+  --clr-dot-inactive:     rgba(255,255,255,0.18);
+  --clr-dot-active:       rgba(255,255,255,0.7);
+  --clr-timeline-line:    linear-gradient(to bottom, rgba(140,100,255,0.3), rgba(255,255,255,0.05) 80%, transparent);
+  --clr-timeline-dot:     rgba(255,255,255,0.25);
+  --clr-timeline-dot-b:   rgba(255,255,255,0.15);
+  --clr-timeline-glow:    rgba(160,130,255,0.9);
+  --clr-resume-bg:        rgba(255,255,255,0.1);
+  --clr-resume-hover:     rgba(255,255,255,0.2);
+}
+
+html.light {
+  /* Light — pastel blue */
+  --clr-bg:               #eef3ff;
+  --clr-surface:          rgba(255,255,255,0.82);
+  --clr-border:           rgba(100,140,230,0.2);
+  --clr-divider:          rgba(100,140,230,0.14);
+  --clr-text-1:           #0d1a3a;
+  --clr-text-2:           rgba(13,26,58,0.68);
+  --clr-text-3:           rgba(13,26,58,0.5);
+  --clr-text-4:           rgba(13,26,58,0.38);
+  --clr-text-5:           rgba(13,26,58,0.3);
+  --clr-text-6:           rgba(13,26,58,0.22);
+  --clr-tag-bg:           rgba(100,150,255,0.1);
+  --clr-tag:              rgba(50,90,200,0.75);
+  --clr-period-bg:        rgba(100,150,255,0.1);
+  --clr-period:           rgba(50,90,200,0.62);
+  --clr-badge-bg:         rgba(100,150,255,0.12);
+  --clr-badge-border:     rgba(100,150,255,0.25);
+  --clr-badge:            rgba(50,100,220,0.75);
+  --clr-accent-bg:        rgba(100,150,255,0.08);
+  --clr-accent-border:    rgba(100,150,255,0.25);
+  --clr-accent-text:      rgba(70,115,220,0.65);
+  --clr-accent-hl:        rgba(50,100,220,0.9);
+  --clr-bullet:           rgba(80,130,255,0.55);
+  --clr-nav-bg:           rgba(238,243,255,0.88);
+  --clr-nav-border:       rgba(100,140,230,0.15);
+  --clr-nav-link:         rgba(13,26,58,0.6);
+  --clr-nav-active-bg:    rgba(100,150,255,0.12);
+  --clr-hero-sub:         rgba(13,26,58,0.35);
+  --clr-hero-desc:        rgba(13,26,58,0.5);
+  --clr-link:             rgba(50,90,200,0.5);
+  --clr-link-hover:       rgba(50,90,200,0.9);
+  --clr-social:           rgba(50,90,200,0.38);
+  --clr-social-hover:     rgba(50,90,200,0.8);
+  --clr-footer-link:      rgba(70,120,220,0.5);
+  --clr-footer-link-hover:rgba(70,120,220,0.9);
+  --clr-stat-bg:          rgba(255,255,255,0.65);
+  --clr-stat-border:      rgba(100,140,230,0.18);
+  --clr-marquee-item:     rgba(13,26,58,0.35);
+  --clr-marquee-bg:       rgba(100,150,255,0.06);
+  --clr-marquee-border:   rgba(100,150,255,0.12);
+  --clr-input-bg:         rgba(255,255,255,0.88);
+  --clr-input-border:     rgba(100,150,255,0.2);
+  --clr-btn:              rgba(100,150,255,0.14);
+  --clr-btn-border:       rgba(100,150,255,0.22);
+  --clr-noise-opacity:    0.015;
+  --clr-dot-inactive:     rgba(100,150,255,0.25);
+  --clr-dot-active:       rgba(70,120,220,0.75);
+  --clr-timeline-line:    linear-gradient(to bottom, rgba(80,130,255,0.35), rgba(100,150,255,0.08) 80%, transparent);
+  --clr-timeline-dot:     rgba(100,150,255,0.3);
+  --clr-timeline-dot-b:   rgba(100,150,255,0.2);
+  --clr-timeline-glow:    rgba(80,130,255,0.85);
+  --clr-resume-bg:        rgba(100,150,255,0.12);
+  --clr-resume-hover:     rgba(100,150,255,0.22);
+}
+
+/* Smooth theme transition */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition:
+    background-color 0.28s ease,
+    border-color 0.28s ease,
+    color 0.28s ease,
+    opacity 0.28s ease !important;
+}
+
+/* ── Base ──────────────────────────────────────────── */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,7 +139,7 @@ html {
 }
 
 body {
-  background: #000;
+  background: var(--clr-bg);
   color: #86868b;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -27,6 +153,11 @@ body {
 ::selection {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
+}
+
+/* Noise overlay opacity controlled by theme */
+.noise-overlay {
+  opacity: var(--clr-noise-opacity);
 }
 
 /* Hide default cursor for custom cursor */
