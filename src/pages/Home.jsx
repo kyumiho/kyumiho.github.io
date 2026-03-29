@@ -383,7 +383,7 @@ export default function Home() {
                   SK Battery America
                 </p>
                 <p className="text-xs" style={{ color: 'var(--clr-text-4)' }}>
-                  Sep 2023 – Present
+                  Feb 2025 – Present
                 </p>
               </motion.div>
 

@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
 
+# Cancel any in-progress deploy for the same branch
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -11,12 +16,13 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
           cache: npm
 
       - name: Install dependencies
@@ -27,7 +33,7 @@ jobs:
         env:
           VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
 
-      - name: Add .nojekyll
+      - name: Add .nojekyll (prevents Jekyll processing)
         run: touch dist/.nojekyll
 
       - name: Deploy to gh-pages branch
@@ -36,3 +42,4 @@ jobs:
           folder: dist
           branch: gh-pages
           clean: true
+          single-commit: true

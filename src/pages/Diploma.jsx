@@ -14,15 +14,28 @@ const education = [
 const workExperience = [
   {
     company: 'SK Battery America',
-    role: 'MES Specialist · Lead Business System Analyst',
-    period: 'Sep 2023 – Present',
+    role: 'Lead Business System Analyst',
+    period: 'Feb 2025 – Present',
+    location: 'Duluth, GA',
+    promoted: true,
+    bullets: [
+      'Lead and oversee business system analysis for MES processes, driving improvements across Formation, quality management, and equipment management.',
+      'Define and guide efficient manufacturing system processes within process management, quality management, and equipment management.',
+      'Analyze, design, develop, test, and implement improvements to Manufacturing Execution System (MES) processes, specifically focused on Formation.',
+    ],
+    tags: ['MES', 'Team Lead', 'Business Analysis', 'Process Design', 'Manufacturing'],
+  },
+  {
+    company: 'SK Battery America',
+    role: 'Business System Analyst',
+    period: 'Sep 2023 – Feb 2025',
     location: 'Duluth, GA',
     bullets: [
-      'Analyze, design, develop, test, and implement improvements to Manufacturing Execution System (MES) processes, specifically focused on Formation.',
-      'Define and guide efficient manufacturing system processes within process management, quality management, and equipment management.',
-      'Operate local sites (SOR/SOP) and provide immediate support during system malfunctions.',
+      'Analyzed, designed, developed, tested, and implemented improvements to Manufacturing Execution System (MES) processes.',
+      'Operated local sites (SOR/SOP) and provided immediate support during system malfunctions.',
+      'Collaborated cross-functionally to map and optimize manufacturing workflows across the formation process.',
     ],
-    tags: ['MES', 'Business Analysis', 'Process Design', 'Manufacturing'],
+    tags: ['MES', 'Business Analysis', 'Process Improvement', 'Manufacturing'],
   },
 ]
 
@@ -224,7 +237,15 @@ export default function Diploma() {
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1.5" style={{ color: 'var(--clr-text-1)' }}>{job.company}</h3>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <h3 className="text-xl font-semibold" style={{ color: 'var(--clr-text-1)' }}>{job.company}</h3>
+                      {job.promoted && (
+                        <span className="px-2 py-0.5 rounded-full text-xs"
+                          style={{ background: 'var(--clr-badge-bg)', color: 'var(--clr-badge)', border: '1px solid var(--clr-badge-border)', whiteSpace: 'nowrap' }}>
+                          ↑ Promoted
+                        </span>
+                      )}
+                    </div>
                     <p className="text-base font-medium mb-0.5" style={{ color: 'var(--clr-text-2)' }}>{job.role}</p>
                     <p className="text-xs" style={{ color: 'var(--clr-period)' }}>{job.location}</p>
                   </div>
