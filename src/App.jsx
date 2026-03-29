@@ -9,6 +9,7 @@ import Home from './pages/Home'
 import Projects from './pages/Projects'
 import Diploma from './pages/Diploma'
 import Contact from './pages/Contact'
+import Game from './pages/Game'
 
 const noiseStyle = {
   position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9990,
@@ -18,22 +19,25 @@ const noiseStyle = {
 
 function AnimatedRoutes() {
   const location = useLocation()
+  const isGame = location.pathname === '/game'
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={location.key}
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: isGame ? 0 : 8 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
+        exit={{ opacity: 0, y: isGame ? 0 : -8 }}
         transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+        style={isGame ? { height: '100vh', overflow: 'hidden' } : {}}
       >
         <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/diploma" element={<Diploma />} />
+          <Route path="/game" element={<Game />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
-        <Footer />
+        {!isGame && <Footer />}
       </motion.div>
     </AnimatePresence>
   )
