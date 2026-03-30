@@ -171,6 +171,49 @@ const WORLD_EVENTS = [
 // PLAYER / STATE HELPERS
 // ══════════════════════════════════════════════════════════
 
+function checkQuests(player, overworldScene) {
+  const quests = player.quests || {}
+  const npcQuests = [
+    { id:'first_blood', goal:'kills',        target:10,   reward:{ gold:200, exp:300 }},
+    { id:'rich_quick',  goal:'trades',       target:5,    reward:{ gold:300, item:'Elixir' }},
+    { id:'boss_slayer', goal:'bossKills',    target:3,    reward:{ gold:1000, exp:2000 }},
+    { id:'rep_grind',   goal:'reputation',   target:1000, reward:{ gold:500 }},
+    { id:'relic_hunt',  goal:'inventory_all',items:['Drake Scale','Ancient Core','Void Crystal'], reward:{ gold:2000, exp:5000 }},
+  ]
+  npcQuests.forEach(q => {
+    if (quests[q.id]) return // already completed
+    let done = false
+    if (q.goal === 'kills')        done = (player.kills  || 0) >= q.target
+    if (q.goal === 'trades')       done = (player.trades || 0) >= q.target
+    if (q.goal === 'bossKills')    done = Object.keys(player.bossKills || {}).length >= q.target
+    if (q.goal === 'reputation')   done = Math.max(...Object.values(player.reputation || {0:0})) >= q.target
+    if (q.goal === 'inventory_all') done = q.items.every(it => (player.inventory || []).includes(it))
+    if (done) {
+      player.quests = player.quests || {}
+      player.quests[q.id] = true
+      const r = q.reward
+      if (r.gold) player.gold += r.gold
+      if (r.exp)  { player.exp += r.exp; checkLevelUp(player) }
+      if (r.item) player.inventory.push(r.item)
+      if (overworldScene) {
+        overworldScene.showNotification(`QUEST COMPLETE!`, `+${r.gold||0}g${r.exp?` +${r.exp}EXP`:''}${r.item?` +${r.item}`:''}`, '#ffd700')
+      }
+    }
+  })
+}
+
+function checkLevelUp(player) {
+  while (player.exp >= expNeeded(player.level)) {
+    player.exp -= expNeeded(player.level)
+    player.level++
+    player.statPoints = (player.statPoints||0) + 3
+    player.maxHp = getMaxHp(player)
+    player.hp    = player.maxHp
+    player.maxMp = getMaxMp(player)
+    player.mp    = player.maxMp
+  }
+}
+
 function expNeeded(lv) { return Math.floor(100 * Math.pow(1.35, lv - 1)) }
 function getMaxHp(p) { return 80 + p.vit * 12 + p.level * 8 }
 function getMaxMp(p) { return 40 + p.int * 8 + p.level * 4 }
@@ -198,6 +241,8 @@ function initPlayer(name, kingdom) {
     reputation: { Iron: 0, Arcanum: 0, Ocean: 0 },
     bossKills: {},
     statusEffects: {},
+    quests: {},
+    title: '',
   }
   p.maxHp = getMaxHp(p)
   p.hp = p.maxHp
@@ -489,9 +534,26 @@ class OverworldScene extends Phaser.Scene {
     // Place NPCs at capital
     this.npcs = this.physics.add.staticGroup()
     const npcPositions = [
-      { x: 296, y: 264, name: 'Guild Master', dialog: ['Welcome, adventurer.', 'Type /help for commands.', 'Find hidden jobs through experience.'] },
-      { x: 344, y: 264, name: 'Shop Keeper', dialog: ['Buy, sell, or trade!', 'Press E near me to open shop.'] },
-      { x: 320, y: 300, name: 'Chronicle', dialog: ['The world records your deeds.', 'Rankings update daily.'] },
+      { x: 296, y: 264, name: 'Guild Master',
+        dialog: ['Welcome, adventurer.', 'Kill 10 Goblins — earn your first rank.', 'Find hidden jobs through experience.', 'Press B near a zone portal to fight the boss!'],
+        quest: { id:'first_blood', label:'First Blood', goal:'kills', target:10, reward:{ gold:200, exp:300 }, desc:'Kill 10 enemies.' }
+      },
+      { x: 344, y: 264, name: 'Shop Keeper',
+        dialog: ['Buy, sell, or trade!', 'Press E to open the shop.', 'Craft materials into gear with C!'],
+        quest: { id:'rich_quick', label:'Supply Run', goal:'trades', target:5, reward:{ gold:300, item:'Elixir' }, desc:'Buy or sell 5 times.' }
+      },
+      { x: 320, y: 300, name: 'Chronicle',
+        dialog: ['The world records your deeds.', 'Rankings update with each kill.', 'Defeat bosses to climb the leaderboard!', 'Kill all 5 zone bosses to be crowned Champion.'],
+        quest: { id:'boss_slayer', label:'Boss Slayer', goal:'bossKills', target:3, reward:{ gold:1000, exp:2000 }, desc:'Defeat 3 zone bosses.' }
+      },
+      { x: 280, y: 300, name: 'Old Hermit',
+        dialog: ['I sense great darkness in the Abyss...', 'Three relics seal the Abyssal God.', 'Drake Scale, Ancient Core, Void Crystal — bring them to me.', 'Then you may face the true final boss.'],
+        quest: { id:'relic_hunt', label:'Relic Hunt', goal:'inventory_all', items:['Drake Scale','Ancient Core','Void Crystal'], reward:{ gold:2000, exp:5000, unlock:'AbyssGod' }, desc:'Collect 3 relics for the hermit.' }
+      },
+      { x: 360, y: 300, name: 'Kingdom Envoy',
+        dialog: ['Each kingdom seeks loyal champions.', 'Build reputation through battle.', 'Reach 1000 rep with your kingdom for a title!', 'True power comes from mastering all kingdoms.'],
+        quest: { id:'rep_grind', label:'Kingdom Champion', goal:'reputation', target:1000, reward:{ gold:500, title:'Champion' }, desc:'Reach 1000 reputation with your home kingdom.' }
+      },
     ]
     npcPositions.forEach(n => {
       const npc = this.npcs.create(n.x, n.y, 'npc')
@@ -554,7 +616,7 @@ class OverworldScene extends Phaser.Scene {
     const W = this.scale.width
     const H = this.scale.height
     this.bottomBar = this.add.rectangle(0, H - 20, W, 20, 0x000000, 0.8).setOrigin(0,0).setScrollFactor(0).setDepth(99)
-    this.helpText  = this.add.text(8, H - 16, 'WASD:Move  E:Shop  K:Fight  B:Boss  I:Inv  C:Craft  M:Map  P:Rep  R:Rank', {
+    this.helpText  = this.add.text(8, H - 16, 'WASD:Move  E:Shop  K:Fight  B:Boss  I:Inv  C:Craft  Q:Quests  M:Map  P:Rep  R:Rank', {
       font: '6px monospace', fill: '#888888'
     }).setScrollFactor(0).setDepth(100)
 
@@ -598,8 +660,26 @@ class OverworldScene extends Phaser.Scene {
     const job = JOBS[key]
     bridge.player.job = key
     this.showNotification(`HIDDEN JOB UNLOCKED!`, `${job.icon} ${job.label}\n${job.desc}`, '#ffdd44')
+    this.spawnParticles(this.playerSprite?.x || 320, this.playerSprite?.y || 280, 0xffd700, 20)
     saveGame(bridge.player)
     saveRanking(bridge.player)
+  }
+
+  spawnParticles(x, y, color, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const px = this.add.rectangle(x, y, 3, 3, color).setDepth(20)
+      const angle = (i / count) * Math.PI * 2
+      const speed = Phaser.Math.Between(30, 80)
+      this.tweens.add({
+        targets: px,
+        x: x + Math.cos(angle) * speed,
+        y: y + Math.sin(angle) * speed,
+        alpha: 0, scaleX: 0, scaleY: 0,
+        duration: Phaser.Math.Between(400, 800),
+        ease: 'Power2',
+        onComplete: () => px.destroy(),
+      })
+    }
   }
 
   showNotification(title, body, color = '#ffffff') {
@@ -644,6 +724,7 @@ class OverworldScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-B', () => this.tryBossFight())
     this.input.keyboard.on('keydown-C', () => this.openCraft())
     this.input.keyboard.on('keydown-P', () => this.openReputation())
+    this.input.keyboard.on('keydown-Q', () => this.openQuestLog())
 
     // Portal overlap
     this.physics.add.overlap(this.playerSprite, this.portals, (pl, portal) => {
@@ -723,12 +804,24 @@ class OverworldScene extends Phaser.Scene {
       if (d < minDist) { minDist = d; closest = npc }
     })
     if (closest) {
-      const zone = ZONES.find(z => z.id === bridge.player.zone)
-      if (closest.npcData.name === 'Shop Keeper' || (zone && zone.market)) {
+      const npcData = closest.npcData
+      if (npcData.name === 'Shop Keeper') {
         this.scene.launch('Shop', { player: bridge.player, overworldScene: this })
         return
       }
-      this.showMessage(`[${closest.npcData.name}] ${closest.npcData.dialog[Math.floor(Math.random()*closest.npcData.dialog.length)]}`, '#ffdd44')
+      // Check quest turn-in
+      if (npcData.quest) {
+        checkQuests(bridge.player, this)
+        const q = npcData.quest
+        const done = bridge.player.quests?.[q.id]
+        const progress = this.getQuestProgress(bridge.player, q)
+        const questLine = done
+          ? `[Quest: ${q.label} COMPLETE ✓]`
+          : `[Quest: ${q.label} — ${progress}]`
+        this.showMessage(`[${npcData.name}] ${npcData.dialog[Math.floor(Math.random()*npcData.dialog.length)]}\n${questLine}`, '#ffdd44')
+      } else {
+        this.showMessage(`[${npcData.name}] ${npcData.dialog[Math.floor(Math.random()*npcData.dialog.length)]}`, '#ffdd44')
+      }
       return
     }
 
@@ -798,6 +891,11 @@ class OverworldScene extends Phaser.Scene {
     this.scene.launch('Reputation', { player: bridge.player })
   }
 
+  openQuestLog() {
+    if (this.scene.isActive('QuestLog')) { this.scene.stop('QuestLog'); return }
+    this.scene.launch('QuestLog', { player: bridge.player })
+  }
+
   tryBossFight() {
     const zone = ZONES.find(z => z.id === bridge.player.zone)
     if (!zone || zone.danger === 0) { this.showMessage('No boss in this zone.', '#888888'); return }
@@ -853,9 +951,18 @@ class OverworldScene extends Phaser.Scene {
   closeAllPanels() {
     this.inventoryOpen = false
     this.mapOpen = false
-    ;['Inventory', 'ZoneMap', 'Shop', 'Rankings', 'StatAlloc', 'Crafting', 'Reputation'].forEach(s => {
+    ;['Inventory', 'ZoneMap', 'Shop', 'Rankings', 'StatAlloc', 'Crafting', 'Reputation', 'QuestLog'].forEach(s => {
       if (this.scene.isActive(s)) this.scene.stop(s)
     })
+  }
+
+  getQuestProgress(p, q) {
+    if (q.goal === 'kills')         return `${p.kills||0}/${q.target} kills`
+    if (q.goal === 'trades')        return `${p.trades||0}/${q.target} trades`
+    if (q.goal === 'bossKills')     return `${Object.keys(p.bossKills||{}).length}/${q.target} bosses`
+    if (q.goal === 'reputation')    return `${Math.max(...Object.values(p.reputation||{0:0}))}/${q.target} rep`
+    if (q.goal === 'inventory_all') return q.items.map(it => `${it}:${p.inventory?.includes(it)?'✓':'✗'}`).join(' ')
+    return '?'
   }
 
   quickSave() {
@@ -868,6 +975,7 @@ class OverworldScene extends Phaser.Scene {
     this.updateUI()
     if (result.levelUp) {
       this.showNotification(`LEVEL UP!`, `Now Lv.${bridge.player.level}\nYou have ${bridge.player.statPoints} stat points!`, '#ffdd44')
+      this.spawnParticles(this.playerSprite?.x || 320, this.playerSprite?.y || 280, 0x00ff88, 16)
       this.time.delayedCall(500, () => {
         this.scene.launch('StatAlloc', { player: bridge.player, overworldScene: this })
       })
@@ -882,14 +990,26 @@ class OverworldScene extends Phaser.Scene {
       bridge.player.bossKills = bridge.player.bossKills || {}
       bridge.player.bossKills[result.zoneId] = true
       this.showNotification(`BOSS DEFEATED!`, `${result.enemyName} has fallen!\nAll kingdom reputation +200!`, '#ff4444')
+      this.spawnParticles(this.scale.width/2, this.scale.height/2, 0xff4444, 30)
       gainRep(bridge.player, 'Iron', 200)
       gainRep(bridge.player, 'Arcanum', 200)
       gainRep(bridge.player, 'Ocean', 200)
-      // Discover Abyss after killing 3 bosses
       const bossCount = Object.keys(bridge.player.bossKills).length
+      // Discover Abyss after 3 bosses
       if (bossCount >= 3 && !bridge.discoveredZones?.includes('Abyss')) {
         bridge.discoveredZones = [...(bridge.discoveredZones||[]), 'Abyss']
-        this.showNotification(`ZONE DISCOVERED!`, 'The Abyssal Depths have been revealed on your map!', '#9932cc')
+        this.time.delayedCall(1500, () =>
+          this.showNotification(`ZONE DISCOVERED!`, 'The Abyssal Depths revealed!\nTravel to face the final trial.', '#9932cc')
+        )
+      }
+      // Succession: killing Abyssal God = true ending
+      if (result.enemyName === 'Abyssal God') {
+        bridge.player.title = 'Abyssal Champion'
+        saveRanking(bridge.player)
+        saveGame(bridge.player)
+        this.time.delayedCall(2000, () => {
+          this.scene.launch('Ending', { player: bridge.player })
+        })
       }
     }
     if (result.pkKill) {
@@ -899,6 +1019,7 @@ class OverworldScene extends Phaser.Scene {
       bridge.player.gold += goldGain
       this.showMessage(`PK Victory! +${goldGain}g (PK:${bridge.player.pkKills})`, '#ff8844')
     }
+    checkQuests(bridge.player, this)
     saveGame(bridge.player)
     saveRanking(bridge.player)
 
@@ -1378,6 +1499,9 @@ class CombatScene extends Phaser.Scene {
       })
     }
 
+    if (this.isBoss) {
+      this.cameras.main.flash(500, 255, 50, 50)
+    }
     this.time.delayedCall(1200, () => this.endCombat(true))
   }
 
@@ -1715,6 +1839,136 @@ class RankingsScene extends Phaser.Scene {
   }
 }
 
+// ── EndingScene ──
+class EndingScene extends Phaser.Scene {
+  constructor() { super('Ending') }
+  init(data) { this.player = data.player }
+
+  create() {
+    const W = this.scale.width, H = this.scale.height
+    const p = this.player
+    const k = KINGDOMS[p.kingdom] || KINGDOMS.Iron
+
+    this.cameras.main.setBackgroundColor('#000000')
+    this.cameras.main.fadeIn(2000, 0, 0, 0)
+
+    // Starfield
+    for (let i = 0; i < 80; i++) {
+      const star = this.add.rectangle(
+        Phaser.Math.Between(0, W), Phaser.Math.Between(0, H),
+        1, 1, 0xffffff
+      ).setAlpha(Math.random())
+      this.tweens.add({ targets: star, alpha: 0, duration: Phaser.Math.Between(1000, 3000), yoyo: true, repeat: -1 })
+    }
+
+    const lines = [
+      { text: '⚔ KINGDOM OF AETHORIA ⚔', color: '#ffd700', size: '14px', y: H * 0.12 },
+      { text: 'THE ABYSSAL GOD HAS FALLEN', color: '#ff4444', size: '11px', y: H * 0.22 },
+      { text: `${p.name} of ${k.label}`, color: k.hexStr, size: '10px', y: H * 0.33 },
+      { text: `${JOBS[p.job]?.label || 'Wanderer'}  ·  Lv.${p.level}  ·  ${p.kills} Kills`, color: '#ffffff', size: '8px', y: H * 0.42 },
+      { text: `Gold: ${p.gold}g  ·  PK: ${p.pkKills||0}  ·  Score: ${rankScore(p)}`, color: '#aaaaaa', size: '7px', y: H * 0.50 },
+      { text: 'ABYSSAL CHAMPION', color: '#ffd700', size: '12px', y: H * 0.61 },
+      { text: 'The void bows before you.', color: '#888888', size: '7px', y: H * 0.70 },
+      { text: 'Your legend is recorded in the Kingdom Rankings forever.', color: '#666666', size: '6px', y: H * 0.78 },
+    ]
+
+    lines.forEach((l, i) => {
+      const t = this.add.text(W/2, l.y, l.text, {
+        font: `${l.size} monospace`, fill: l.color, stroke: '#000', strokeThickness: 2, align: 'center'
+      }).setOrigin(0.5).setAlpha(0)
+      this.tweens.add({ targets: t, alpha: 1, duration: 800, delay: 500 + i * 600 })
+    })
+
+    // Particle celebration
+    this.time.delayedCall(2000, () => {
+      for (let i = 0; i < 5; i++) {
+        this.time.delayedCall(i * 300, () => {
+          const colors = [0xffd700, 0xff4444, 0x00ff88, 0x8040c0, 0x4488ff]
+          colors.forEach(c => {
+            for (let j = 0; j < 4; j++) {
+              const px = this.add.rectangle(Phaser.Math.Between(50, W-50), Phaser.Math.Between(50, H-50), 3, 3, c)
+              this.tweens.add({ targets: px, alpha: 0, y: '-=60', duration: 1000, onComplete: () => px.destroy() })
+            }
+          })
+        })
+      }
+    })
+
+    // Back button
+    const btn = this.add.text(W/2, H * 0.9, '[ Return to Menu ]', {
+      font: '8px monospace', fill: '#ffd700', stroke: '#000', strokeThickness: 2
+    }).setOrigin(0.5).setAlpha(0).setInteractive()
+    this.tweens.add({ targets: btn, alpha: 1, duration: 800, delay: 5000 })
+    btn.on('pointerdown', () => {
+      this.scene.stop('Ending')
+      this.scene.stop('Overworld')
+      bridge.callbacks.returnToMenu?.()
+    })
+    btn.on('pointerover', () => btn.setStyle({ fill: '#ffffff' }))
+    btn.on('pointerout',  () => btn.setStyle({ fill: '#ffd700' }))
+  }
+}
+
+// ── QuestLogScene ──
+class QuestLogScene extends Phaser.Scene {
+  constructor() { super('QuestLog') }
+  init(data) { this.player = data.player }
+
+  create() {
+    const W = this.scale.width, H = this.scale.height
+    const p = this.player
+    this.cameras.main.setBackgroundColor('rgba(0,0,0,0.9)')
+    this.add.rectangle(W/2, H/2, W-20, H-20, 0x0d1117).setStrokeStyle(1, 0xffd700)
+    this.add.text(W/2, 14, '📜 QUEST LOG', { font: '10px monospace', fill: '#ffd700', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5)
+
+    const allQuests = [
+      { id:'first_blood', label:'First Blood',     goal:'kills',        target:10,   items:null, desc:'Kill 10 enemies.',           reward:'200g + 300EXP' },
+      { id:'rich_quick',  label:'Supply Run',      goal:'trades',       target:5,    items:null, desc:'Buy or sell 5 times.',       reward:'300g + Elixir' },
+      { id:'boss_slayer', label:'Boss Slayer',      goal:'bossKills',   target:3,    items:null, desc:'Defeat 3 zone bosses.',      reward:'1000g + 2000EXP' },
+      { id:'rep_grind',   label:'Kingdom Champion', goal:'reputation',  target:1000, items:null, desc:'1000 rep with home kingdom.',reward:'500g' },
+      { id:'relic_hunt',  label:'Relic Hunt',       goal:'inventory_all',target:null,items:['Drake Scale','Ancient Core','Void Crystal'], desc:'Collect the 3 ancient relics.', reward:'2000g + 5000EXP' },
+    ]
+
+    let y = 32
+    allQuests.forEach(q => {
+      const done = p.quests?.[q.id]
+      let prog = ''
+      if (!done) {
+        if (q.goal === 'kills')          prog = `${p.kills||0}/${q.target}`
+        if (q.goal === 'trades')         prog = `${p.trades||0}/${q.target}`
+        if (q.goal === 'bossKills')      prog = `${Object.keys(p.bossKills||{}).length}/${q.target}`
+        if (q.goal === 'reputation')     prog = `${Math.max(...Object.values(p.reputation||{0:0}))}/${q.target}`
+        if (q.goal === 'inventory_all')  prog = q.items.map(it => `${it.split(' ')[0]}:${p.inventory?.includes(it)?'✓':'✗'}`).join(' ')
+      }
+
+      const statusColor = done ? '#00ff88' : '#ffdd44'
+      const statusLabel = done ? '✓ COMPLETE' : `⋯ ${prog}`
+
+      this.add.text(20, y, `${q.label}`, { font: '8px monospace', fill: statusColor }).setOrigin(0, 0)
+      this.add.text(W - 20, y, statusLabel, { font: '7px monospace', fill: statusColor }).setOrigin(1, 0)
+      y += 10
+      this.add.text(24, y, q.desc, { font: '6px monospace', fill: '#888888' }).setOrigin(0, 0)
+      this.add.text(W - 20, y, `Reward: ${q.reward}`, { font: '6px monospace', fill: '#aa8833' }).setOrigin(1, 0)
+      y += 14
+    })
+
+    // Succession quest hint
+    y += 4
+    const bossCount = Object.keys(p.bossKills || {}).length
+    const hasRelics = ['Drake Scale','Ancient Core','Void Crystal'].every(it => p.inventory?.includes(it))
+    const succUnlocked = bossCount >= 5 || hasRelics
+    this.add.text(W/2, y, '── SUCCESSION QUEST ──', { font: '7px monospace', fill: succUnlocked ? '#ff4444' : '#444444' }).setOrigin(0.5); y += 12
+    this.add.text(W/2, y, succUnlocked
+      ? 'Travel to Abyss and face the Abyssal God! (Lv 25+)'
+      : 'Defeat 5 bosses or collect 3 relics to unlock the final trial.',
+      { font: '6px monospace', fill: succUnlocked ? '#ff8888' : '#555555', align:'center', wordWrap:{width:W-40} }).setOrigin(0.5)
+
+    this.add.text(W - 16, H - 12, '[Q/ESC] Close', { font: '6px monospace', fill: '#888888' }).setOrigin(1, 1)
+    this.input.keyboard.on('keydown-Q',   () => this.scene.stop('QuestLog'))
+    this.input.keyboard.on('keydown-ESC', () => this.scene.stop('QuestLog'))
+  }
+}
+
 // ── CraftingScene ──
 class CraftingScene extends Phaser.Scene {
   constructor() { super('Crafting') }
@@ -1864,11 +2118,18 @@ export default function Game() {
       pixelArt: true,
       antialias: false,
       physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
-      scene: [BootScene, OverworldScene, CombatScene, ShopScene, InventoryScene, ZoneMapScene, StatAllocScene, RankingsScene, CraftingScene, ReputationScene],
+      scene: [BootScene, OverworldScene, CombatScene, ShopScene, InventoryScene, ZoneMapScene, StatAllocScene, RankingsScene, CraftingScene, ReputationScene, QuestLogScene, EndingScene],
     }
 
     const game = new Phaser.Game(config)
     gameRef.current = game
+
+    bridge.callbacks.returnToMenu = () => {
+      if (gameRef.current) { gameRef.current.destroy(true); gameRef.current = null }
+      setScreen('menu')
+      setSavedPlayer(loadGame())
+      setRankings(loadRankings())
+    }
 
     return () => {
       if (gameRef.current) {
