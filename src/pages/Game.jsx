@@ -95,12 +95,76 @@ const ITEMS = {
   'Rusty Dagger':       { type:'weapon',     cost:30,  atk:3,           desc:'+3 ATK (salvaged)' },
 }
 
+// Job skills — each job gets 2 active skills in combat
+const JOB_SKILLS = {
+  Wanderer:      [],
+  Vanguard:      [
+    { name: 'Iron Shield', mpCost: 20, desc: 'DEF +50% for 2 turns', effect: 'shield', color: '#c06030' },
+    { name: 'Taunt',       mpCost: 15, desc: 'Enemy focuses you, reduce dmg taken', effect: 'taunt', color: '#cc8844' },
+  ],
+  Berserker:     [
+    { name: 'Berserk',     mpCost: 0,  desc: 'Trade 30 HP for +80% ATK this turn', effect: 'berserk', color: '#ff4444' },
+    { name: 'Rend',        mpCost: 25, desc: 'Bleed: enemy loses HP each turn (3 turns)', effect: 'bleed', color: '#cc2222' },
+  ],
+  Scholar:       [
+    { name: 'Arcane Bolt', mpCost: 30, desc: 'INT×6 magic damage, ignores DEF', effect: 'arcane', color: '#8040c0' },
+    { name: 'Slow Field',  mpCost: 20, desc: 'Enemy ATK -40% next 2 turns', effect: 'slow', color: '#6020a0' },
+  ],
+  VoidWalker:    [
+    { name: 'Void Tear',   mpCost: 35, desc: 'INT×8 void dmg + 20% chance to stun', effect: 'voidtear', color: '#9932cc' },
+    { name: 'Phase Shift', mpCost: 25, desc: 'Dodge next attack (1 turn)', effect: 'phase', color: '#7722aa' },
+  ],
+  ShadowBlade:   [
+    { name: 'Shadowstrike', mpCost:20, desc: 'AGI×4 dmg, guaranteed crit if enemy HP>50%', effect: 'shadowstrike', color: '#555577' },
+    { name: 'Smoke Bomb',   mpCost:15, desc: '60% flee chance + enemy misses next turn', effect: 'smoke', color: '#444466' },
+  ],
+  MerchantPrince:[
+    { name: 'Bribe',       mpCost: 0,  desc: 'Spend 100g to end battle (keep loot)', effect: 'bribe', color: '#ffd700' },
+    { name: 'Hired Blade', mpCost: 40, desc: 'Summon a guard for 1 hit (STR×5 dmg)', effect: 'hired', color: '#ddaa00' },
+  ],
+  Paladin:       [
+    { name: 'Holy Smite',  mpCost: 30, desc: '(STR+INT)×3 holy dmg, heals 20 HP', effect: 'smite', color: '#87ceeb' },
+    { name: 'Lay Hands',   mpCost: 35, desc: 'Heal 60% max HP', effect: 'heal', color: '#aaddff' },
+  ],
+  Warden:        [
+    { name: 'Trap',        mpCost: 20, desc: 'Set trap — enemy takes 2× dmg next turn', effect: 'trap', color: '#228b22' },
+    { name: 'Scout',       mpCost: 10, desc: 'Reveal enemy weakness, +30% dmg for 3 turns', effect: 'scout', color: '#338833' },
+  ],
+}
+
+// Boss enemies per zone (one unique boss each)
+const BOSSES = {
+  Forest:    { name: 'Gnarled Ancient',  hp:400,  atk:18, def:8,  exp:600,  gold:[80,120],  color:0x1a5c1a, loot:['Ancient Bark','Wolf Pelt','Health Potion'] },
+  Mountains: { name: 'Iron Colossus',    hp:800,  atk:30, def:20, exp:1200, gold:[150,250], color:0x888888, loot:['Iron Core','Stone Core','Silver Blade'] },
+  Shadow:    { name: 'Lord of Shadows',  hp:700,  atk:45, def:15, exp:1500, gold:[200,300], color:0x440066, loot:['Shadow Crystal','Shadow Essence','Mana Elixir'] },
+  Ruins:     { name: 'Lich King',        hp:1500, atk:60, def:25, exp:3000, gold:[400,600], color:0xaaaaff, loot:['Phylactery Shard','Death Tome','Dragon Scale Armor'] },
+  Abyss:     { name: 'Abyssal God',      hp:5000, atk:120,def:60, exp:9999, gold:[1000,2000],color:0x110011, loot:['Void Crystal','Demon Core','Shadow Fang'] },
+}
+
+// Crafting recipes: [ingredient1, ingredient2] → result
+const CRAFTING = [
+  { needs: ['Wolf Pelt', 'Wolf Pelt'],          result: 'Leather Armor',      desc: '2× Wolf Pelt → Leather Armor' },
+  { needs: ['Stone Core', 'Iron Chunk'],         result: 'Chain Mail',         desc: 'Stone Core + Iron Chunk → Chain Mail' },
+  { needs: ['Shadow Essence', 'Void Dust'],      result: 'Shadow Fang',        desc: 'Shadow Essence + Void Dust → Shadow Fang' },
+  { needs: ['Drake Scale', 'Ancient Core'],      result: 'Dragon Scale Armor', desc: 'Drake Scale + Ancient Core → Dragon Scale Armor' },
+  { needs: ['Health Potion', 'Mana Elixir'],     result: 'Elixir',             desc: 'HP Potion + Mana Elixir → Elixir' },
+  { needs: ['Rusty Dagger', 'Stone Core'],       result: 'Iron Sword',         desc: 'Rusty Dagger + Stone Core → Iron Sword' },
+  { needs: ['Bat Wing', 'Spider Silk'],          result: 'Mage Robe',          desc: 'Bat Wing + Spider Silk → Mage Robe' },
+  { needs: ['Demon Core', 'Void Crystal'],       result: 'Shadow Fang',        desc: 'Demon Core + Void Crystal → Shadow Fang (rare)' },
+]
+
+// Expanded world events
 const WORLD_EVENTS = [
-  { id:'goblin_raid',   label:'Goblin Raid!',      desc:'Goblins are raiding the Capital. +50% EXP in Forest for 3 days.',    effect:'exp_forest' },
-  { id:'market_boom',   label:'Trade Boom!',        desc:'Ocean ships arrived. Shop items 20% cheaper for 2 days.',             effect:'shop_discount' },
-  { id:'dark_storm',    label:'Dark Storm',          desc:'Shadow spreads. Shadow Depths enemies are 30% stronger but drop 2x gold.', effect:'shadow_buff' },
-  { id:'ancient_curse', label:'Ancient Curse',       desc:'The Ruins pulse with energy. +100% EXP in Ruins for 3 days.',        effect:'exp_ruins' },
-  { id:'war',           label:'Kingdom War!',        desc:'Iron Kingdom and Arcanum clash. PK rewards tripled this week.',       effect:'pk_bonus' },
+  { id:'goblin_raid',   label:'Goblin Raid!',      desc:'Goblins storm the Capital. +50% EXP in Forest for 2 days.',     effect:'exp_forest',    duration:2 },
+  { id:'market_boom',   label:'Trade Boom!',        desc:'Ocean ships arrived. Shop 20% cheaper for 3 days.',             effect:'shop_discount',  duration:3 },
+  { id:'dark_storm',    label:'Dark Storm',          desc:'Shadow spreads. Shadow enemies 30% stronger but 2× gold.',      effect:'shadow_buff',    duration:2 },
+  { id:'ancient_curse', label:'Ancient Curse',       desc:'Ruins pulse with energy. +100% EXP in Ruins for 3 days.',      effect:'exp_ruins',      duration:3 },
+  { id:'war',           label:'Kingdom War!',        desc:'Iron and Arcanum clash. PK rewards tripled.',                   effect:'pk_bonus',       duration:4 },
+  { id:'bounty_hunt',   label:'Bounty Hunt',         desc:'Guild pays 2× gold for monster kills everywhere.',              effect:'gold_bonus',     duration:2 },
+  { id:'mana_surge',    label:'Mana Surge',          desc:'Magic crackles. All spell damage +60% for 2 days.',            effect:'spell_boost',    duration:2 },
+  { id:'dragon_sighted',label:'Dragon Sighted!',     desc:'A drake was seen near the Ruins. Boss HP −30% for 1 day.',     effect:'boss_weak',      duration:1 },
+  { id:'plague',        label:'Plague',              desc:'Dark plague spreads. Enemies deal +20% dmg but drop 3× loot.', effect:'plague',         duration:3 },
+  { id:'festival',      label:'Festival of Light',   desc:'Capital festival! All shop items free for 1 day.',             effect:'free_shop',      duration:1 },
 ]
 
 // ══════════════════════════════════════════════════════════
@@ -131,6 +195,9 @@ function initPlayer(name, kingdom) {
     reputation: { Iron: 0, Arcanum: 0, Ocean: 0 },
     pkKills: 0, pkDeaths: 0,
     worldDay: 1,
+    reputation: { Iron: 0, Arcanum: 0, Ocean: 0 },
+    bossKills: {},
+    statusEffects: {},
   }
   p.maxHp = getMaxHp(p)
   p.hp = p.maxHp
@@ -139,7 +206,30 @@ function initPlayer(name, kingdom) {
   return p
 }
 
-function rankScore(p) { return p.level * 100 + p.kills * 5 + Math.floor(p.gold / 10) + p.pkKills * 20 }
+function rankScore(p) {
+  const repBonus = Object.values(p.reputation || {}).reduce((a,b)=>a+b,0)
+  const bossBonus = Object.values(p.bossKills || {}).length * 500
+  return p.level * 100 + p.kills * 5 + Math.floor(p.gold / 10) + p.pkKills * 20 + repBonus + bossBonus
+}
+
+function getRepTitle(rep) {
+  if (rep >= 5000) return 'Legend'
+  if (rep >= 2000) return 'Champion'
+  if (rep >= 800)  return 'Hero'
+  if (rep >= 300)  return 'Defender'
+  if (rep >= 100)  return 'Known'
+  if (rep >= 0)    return 'Neutral'
+  if (rep >= -100) return 'Suspect'
+  return 'Enemy'
+}
+
+function gainRep(player, kingdom, amount) {
+  if (!player.reputation) player.reputation = { Iron: 0, Arcanum: 0, Ocean: 0 }
+  player.reputation[kingdom] = (player.reputation[kingdom] || 0) + amount
+  // Gaining rep with one kingdom costs rep with rival
+  const rivals = { Iron: 'Arcanum', Arcanum: 'Iron', Ocean: null }
+  if (rivals[kingdom]) player.reputation[rivals[kingdom]] = (player.reputation[rivals[kingdom]] || 0) - Math.floor(amount * 0.3)
+}
 
 function saveRanking(player) {
   try {
@@ -464,7 +554,7 @@ class OverworldScene extends Phaser.Scene {
     const W = this.scale.width
     const H = this.scale.height
     this.bottomBar = this.add.rectangle(0, H - 20, W, 20, 0x000000, 0.8).setOrigin(0,0).setScrollFactor(0).setDepth(99)
-    this.helpText  = this.add.text(8, H - 16, 'WASD/Arrows:Move  E:Interact  I:Inventory  M:Map  K:Kill  R:Rankings', {
+    this.helpText  = this.add.text(8, H - 16, 'WASD:Move  E:Shop  K:Fight  B:Boss  I:Inv  C:Craft  M:Map  P:Rep  R:Rank', {
       font: '6px monospace', fill: '#888888'
     }).setScrollFactor(0).setDepth(100)
 
@@ -551,6 +641,9 @@ class OverworldScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-R', () => this.scene.launch('Rankings', { player: this.player }))
     this.input.keyboard.on('keydown-ESC', () => this.closeAllPanels())
     this.input.keyboard.on('keydown-F5', e => { e.preventDefault(); this.quickSave() })
+    this.input.keyboard.on('keydown-B', () => this.tryBossFight())
+    this.input.keyboard.on('keydown-C', () => this.openCraft())
+    this.input.keyboard.on('keydown-P', () => this.openReputation())
 
     // Portal overlap
     this.physics.add.overlap(this.playerSprite, this.portals, (pl, portal) => {
@@ -695,6 +788,58 @@ class OverworldScene extends Phaser.Scene {
     }
   }
 
+  openCraft() {
+    if (this.scene.isActive('Crafting')) { this.scene.stop('Crafting'); return }
+    this.scene.launch('Crafting', { player: bridge.player, overworldScene: this })
+  }
+
+  openReputation() {
+    if (this.scene.isActive('Reputation')) { this.scene.stop('Reputation'); return }
+    this.scene.launch('Reputation', { player: bridge.player })
+  }
+
+  tryBossFight() {
+    const zone = ZONES.find(z => z.id === bridge.player.zone)
+    if (!zone || zone.danger === 0) { this.showMessage('No boss in this zone.', '#888888'); return }
+    const boss = BOSSES[zone.id]
+    if (!boss) { this.showMessage('No boss here.', '#888888'); return }
+    if (bridge.player.level < zone.minLv) { this.showMessage(`Need Lv ${zone.minLv} for this boss!`, '#ff4444'); return }
+
+    const alreadyKilled = bridge.player.bossKills?.[zone.id]
+    let bossData = { ...boss }
+    if (bridge.worldEvent?.effect === 'boss_weak') bossData.hp = Math.floor(bossData.hp * 0.7)
+    if (alreadyKilled) bossData.hp = Math.floor(bossData.hp * 1.5) // respawn harder
+
+    this.showMessage(`${boss.name} awakens!`, '#ff4444')
+    this.scene.launch('Combat', {
+      player: bridge.player, enemyName: boss.name, enemyData: bossData,
+      overworldScene: this, isBoss: true, zoneId: zone.id,
+    })
+  }
+
+  tryPKEncounter() {
+    const zone = ZONES.find(z => z.id === bridge.player.zone)
+    if (!zone || zone.danger < 2) return
+    if (bridge.worldEvent?.effect === 'pk_bonus' && Math.random() < 0.15) this.spawnBandit()
+    else if (Math.random() < 0.05) this.spawnBandit()
+  }
+
+  spawnBandit() {
+    const p = bridge.player
+    const banditLv = Math.max(1, p.level + Phaser.Math.Between(-2, 2))
+    const bandit = {
+      name: `Lv${banditLv} Bandit`,
+      hp:  banditLv * 30 + 50,
+      atk: banditLv * 5 + 10,
+      def: banditLv * 2 + 3,
+      exp: banditLv * 40,
+      gold: [banditLv * 10, banditLv * 25],
+      loot: p.inventory.length > 0 ? [p.inventory[0]] : [],
+    }
+    this.showMessage(`A ${bandit.name} attacks you!`, '#ff4444')
+    this.scene.launch('Combat', { player: p, enemyName: bandit.name, enemyData: bandit, overworldScene: this, isPK: true })
+  }
+
   openZoneMap() {
     this.mapOpen = !this.mapOpen
     if (this.mapOpen) {
@@ -708,7 +853,7 @@ class OverworldScene extends Phaser.Scene {
   closeAllPanels() {
     this.inventoryOpen = false
     this.mapOpen = false
-    ;['Inventory', 'ZoneMap', 'Shop', 'Rankings', 'StatAlloc'].forEach(s => {
+    ;['Inventory', 'ZoneMap', 'Shop', 'Rankings', 'StatAlloc', 'Crafting', 'Reputation'].forEach(s => {
       if (this.scene.isActive(s)) this.scene.stop(s)
     })
   }
@@ -733,8 +878,32 @@ class OverworldScene extends Phaser.Scene {
     if (result.loot && result.loot.length > 0) {
       this.showMessage(`Loot: ${result.loot.join(', ')}`, '#ffd700')
     }
+    if (result.bossKill) {
+      bridge.player.bossKills = bridge.player.bossKills || {}
+      bridge.player.bossKills[result.zoneId] = true
+      this.showNotification(`BOSS DEFEATED!`, `${result.enemyName} has fallen!\nAll kingdom reputation +200!`, '#ff4444')
+      gainRep(bridge.player, 'Iron', 200)
+      gainRep(bridge.player, 'Arcanum', 200)
+      gainRep(bridge.player, 'Ocean', 200)
+      // Discover Abyss after killing 3 bosses
+      const bossCount = Object.keys(bridge.player.bossKills).length
+      if (bossCount >= 3 && !bridge.discoveredZones?.includes('Abyss')) {
+        bridge.discoveredZones = [...(bridge.discoveredZones||[]), 'Abyss']
+        this.showNotification(`ZONE DISCOVERED!`, 'The Abyssal Depths have been revealed on your map!', '#9932cc')
+      }
+    }
+    if (result.pkKill) {
+      bridge.player.pkKills = (bridge.player.pkKills||0) + 1
+      const mult = bridge.worldEvent?.effect === 'pk_bonus' ? 3 : 1
+      const goldGain = result.pkGold * mult
+      bridge.player.gold += goldGain
+      this.showMessage(`PK Victory! +${goldGain}g (PK:${bridge.player.pkKills})`, '#ff8844')
+    }
     saveGame(bridge.player)
     saveRanking(bridge.player)
+
+    // Small chance of PK encounter after combat in dangerous zones
+    this.time.delayedCall(1500, () => this.tryPKEncounter())
   }
 }
 
@@ -747,9 +916,15 @@ class CombatScene extends Phaser.Scene {
     this.enemyName  = data.enemyName
     this.enemyData  = { ...data.enemyData }
     this.overworldScene = data.overworldScene
+    this.isBoss     = data.isBoss || false
+    this.isPK       = data.isPK   || false
+    this.zoneId     = data.zoneId
     this.log        = []
     this.turn       = 'player'
     this.result     = { levelUp: false, jobUnlock: null, loot: [] }
+    this.enemyStatus = {}
+    this.playerBuff  = {}
+    this.combatBuff  = {}
   }
 
   create() {
@@ -821,20 +996,189 @@ class CombatScene extends Phaser.Scene {
   }
 
   createButtons(W, H) {
-    const btns = [
-      { label: 'Attack',     x: W/2 - 60, action: () => this.doAttack() },
-      { label: 'Magic',      x: W/2,      action: () => this.doMagic() },
-      { label: 'Use Potion', x: W/2 + 60, action: () => this.usePotion() },
-      { label: 'Flee',       x: W/2 + 120,action: () => this.flee() },
+    const skills = JOB_SKILLS[this.player.job] || []
+
+    // Row 1: base actions
+    const row1 = [
+      { label: 'Attack',   color: 0x224422, action: () => this.doAttack() },
+      { label: 'Magic',    color: 0x222244, action: () => this.doMagic() },
+      { label: 'Potion',   color: 0x442222, action: () => this.usePotion() },
+      { label: 'Flee',     color: 0x333322, action: () => this.flee() },
     ]
-    btns.forEach(b => {
-      const btn = this.add.rectangle(b.x, H * 0.9, 50, 14, 0x222233).setInteractive().setStrokeStyle(1, 0x4488ff)
-      const lbl = this.add.text(b.x, H * 0.9, b.label, { font: '6px monospace', fill: '#ffffff' }).setOrigin(0.5)
-      btn.on('pointerover',  () => btn.setFillStyle(0x334466))
-      btn.on('pointerout',   () => btn.setFillStyle(0x222233))
-      btn.on('pointerdown',  () => { if (this.turn === 'player' && !this.busy) b.action() })
-      this.add.existing(btn)
+    const totalRow1 = row1.length
+    row1.forEach((b, i) => {
+      const bx = W / (totalRow1 + 1) * (i + 1)
+      const btn = this.add.rectangle(bx, H * 0.86, 46, 13, b.color).setInteractive().setStrokeStyle(1, 0x4488ff)
+      this.add.text(bx, H * 0.86, b.label, { font: '6px monospace', fill: '#ffffff' }).setOrigin(0.5)
+      btn.on('pointerover', () => btn.setFillStyle(0x336688))
+      btn.on('pointerout',  () => btn.setFillStyle(b.color))
+      btn.on('pointerdown', () => { if (this.turn === 'player' && !this.busy) b.action() })
     })
+
+    // Row 2: job skills
+    if (skills.length > 0) {
+      skills.forEach((sk, i) => {
+        const bx = W / (skills.length + 1) * (i + 1)
+        const col = Phaser.Display.Color.HexStringToColor(sk.color.replace('#','')).color
+        const btn = this.add.rectangle(bx, H * 0.95, 70, 13, 0x111122).setInteractive().setStrokeStyle(1, col)
+        this.add.text(bx, H * 0.95, `${sk.name} (${sk.mpCost}MP)`, { font: '5px monospace', fill: sk.color }).setOrigin(0.5)
+        btn.on('pointerover', () => btn.setFillStyle(0x223344))
+        btn.on('pointerout',  () => btn.setFillStyle(0x111122))
+        btn.on('pointerdown', () => { if (this.turn === 'player' && !this.busy) this.useSkill(sk) })
+      })
+    }
+  }
+
+  useSkill(sk) {
+    const p = this.player
+    if (sk.mpCost > 0 && p.mp < sk.mpCost) { this.addLog(`Not enough MP! (need ${sk.mpCost})`); return }
+    if (sk.mpCost > 0) p.mp -= sk.mpCost
+    this.busy = true
+
+    switch (sk.effect) {
+      case 'berserk': {
+        const sacrifice = Math.min(30, p.hp - 1)
+        p.hp = Math.max(1, p.hp - sacrifice)
+        this.combatBuff = (this.combatBuff||{})
+        this.combatBuff.atkBoost = (this.combatBuff.atkBoost||1) * 1.8
+        this.combatBuff.atkTurns = 1
+        this.addLog(`BERSERK! -${sacrifice}HP, ATK ×1.8 this turn!`)
+        this.doAttackWithMult(1.8)
+        return
+      }
+      case 'bleed': {
+        this.enemyStatus = { bleed: 3, bleedDmg: Math.floor(getAtk(p) * 0.4) }
+        this.addLog(`REND! Enemy bleeds for ${this.enemyStatus.bleedDmg}/turn × 3`)
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'arcane': {
+        const dmg = p.int * 6
+        this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
+        this.addLog(`✦ Arcane Bolt: ${dmg} magic dmg (ignores DEF)!`)
+        this.updateBars()
+        if (this.enemyData.hp <= 0) { this.victory(); return }
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'voidtear': {
+        const dmg = p.int * 8
+        this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
+        const stun = Math.random() < 0.2
+        this.addLog(`◈ Void Tear: ${dmg} dmg!${stun ? ' Enemy STUNNED!' : ''}`)
+        if (stun) this.enemyStunned = 1
+        this.updateBars()
+        if (this.enemyData.hp <= 0) { this.victory(); return }
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'shadowstrike': {
+        const isCrit = this.enemyData.hp / this.enemyMaxHp > 0.5
+        const dmg = p.agi * 4 * (isCrit ? 2 : 1)
+        this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
+        this.addLog(`† Shadow Strike: ${dmg} dmg!${isCrit ? ' CRITICAL!' : ''}`)
+        this.updateBars()
+        if (this.enemyData.hp <= 0) { this.victory(); return }
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'smite': {
+        const dmg = (p.str + p.int) * 3
+        const heal = 20
+        this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
+        p.hp = Math.min(p.maxHp, p.hp + heal)
+        this.addLog(`✟ Holy Smite: ${dmg} dmg, +${heal} HP!`)
+        this.updateBars()
+        if (this.enemyData.hp <= 0) { this.victory(); return }
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'heal': {
+        const heal = Math.floor(p.maxHp * 0.6)
+        p.hp = Math.min(p.maxHp, p.hp + heal)
+        this.addLog(`✟ Lay Hands: +${heal} HP (${p.hp}/${p.maxHp})`)
+        this.updateBars()
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'bribe': {
+        if (p.gold < 100) { this.addLog('Need 100g to bribe!'); this.busy = false; return }
+        p.gold -= 100
+        this.addLog('Bribed enemy — ending battle, keeping loot!')
+        this.time.delayedCall(600, () => this.victory())
+        return
+      }
+      case 'trap': {
+        this.enemyStatus = (this.enemyStatus||{})
+        this.enemyStatus.trap = true
+        this.addLog('Trap set! Enemy takes 2× damage next hit.')
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'scout': {
+        this.combatBuff = (this.combatBuff||{})
+        this.combatBuff.dmgMult = 1.3; this.combatBuff.dmgTurns = 3
+        this.addLog(`Scouted enemy weakness! +30% dmg for 3 turns.`)
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'shield': {
+        this.playerBuff = (this.playerBuff||{})
+        this.playerBuff.shieldTurns = 2
+        this.addLog('Iron Shield! DEF +50% for 2 turns.')
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'slow': {
+        this.enemyStatus = (this.enemyStatus||{})
+        this.enemyStatus.slow = 2
+        this.addLog('Slow Field! Enemy ATK -40% for 2 turns.')
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'phase': {
+        this.playerBuff = (this.playerBuff||{})
+        this.playerBuff.dodge = 1
+        this.addLog('Phase Shift! Will dodge next attack.')
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      case 'smoke': {
+        if (Math.random() < 0.6) {
+          this.enemyStatus = (this.enemyStatus||{})
+          this.enemyStatus.miss = 1
+          this.addLog('Smoke Bomb! Enemy misses next turn.')
+          this.endCombat(false)
+        } else {
+          this.addLog('Smoke failed!')
+          this.time.delayedCall(400, () => this.enemyTurn())
+        }
+        return
+      }
+      case 'hired': {
+        const dmg = p.str * 5
+        this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
+        this.addLog(`Hired Blade strikes for ${dmg}!`)
+        this.updateBars()
+        if (this.enemyData.hp <= 0) { this.victory(); return }
+        this.time.delayedCall(400, () => this.enemyTurn())
+        return
+      }
+      default:
+        this.busy = false
+    }
+  }
+
+  doAttackWithMult(mult) {
+    const p = this.player
+    const atk = Math.floor(getAtk(p) * mult)
+    let dmg = Math.max(1, atk - this.enemyData.def + Phaser.Math.Between(-3, 3))
+    if (this.enemyStatus?.trap) { dmg *= 2; this.enemyStatus.trap = false; this.addLog('TRAP triggered! 2× damage!') }
+    this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
+    this.addLog(`Berserk attack: ${dmg} dmg!`)
+    this.updateBars()
+    if (this.enemyData.hp <= 0) { this.victory(); return }
+    this.time.delayedCall(400, () => this.enemyTurn())
   }
 
   addLog(msg) {
@@ -848,8 +1192,13 @@ class CombatScene extends Phaser.Scene {
   doAttack() {
     this.busy = true
     const p = this.player
-    const atk = getAtk(p)
-    const dmg = Math.max(1, atk - this.enemyData.def + Phaser.Math.Between(-3, 3))
+    let atk = getAtk(p)
+    if (this.combatBuff?.dmgMult && this.combatBuff.dmgTurns > 0) {
+      atk = Math.floor(atk * this.combatBuff.dmgMult)
+      this.combatBuff.dmgTurns--
+    }
+    let dmg = Math.max(1, atk - this.enemyData.def + Phaser.Math.Between(-3, 3))
+    if (this.enemyStatus?.trap) { dmg *= 2; this.enemyStatus.trap = false; this.addLog('TRAP!') }
     this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
     this.addLog(`You attack for ${dmg} dmg!`)
     this.tweens.add({ targets: this.playerSprite, x: '+=20', duration: 100, yoyo: true, onComplete: () => {
@@ -901,7 +1250,42 @@ class CombatScene extends Phaser.Scene {
   enemyTurn() {
     this.turn = 'enemy'
     const p = this.player
-    const eDmg = Math.max(1, this.enemyData.atk - getDef(p) + Phaser.Math.Between(-2, 4))
+
+    // Apply bleed to enemy
+    if (this.enemyStatus?.bleed > 0) {
+      const bd = this.enemyStatus.bleedDmg
+      this.enemyData.hp = Math.max(0, this.enemyData.hp - bd)
+      this.enemyStatus.bleed--
+      this.addLog(`Bleed: ${bd} dmg! (${this.enemyStatus.bleed} turns left)`)
+      if (this.enemyData.hp <= 0) { this.victory(); return }
+    }
+
+    // Stun check
+    if (this.enemyStunned > 0) {
+      this.enemyStunned--
+      this.addLog(`${this.enemyName} is stunned!`)
+      this.turn = 'player'; this.busy = false
+      this.updateBars()
+      return
+    }
+
+    // Slow
+    let eAtk = this.enemyData.atk
+    if (this.enemyStatus?.slow > 0) { eAtk = Math.floor(eAtk * 0.6); this.enemyStatus.slow-- }
+    if (this.enemyStatus?.miss > 0) { this.enemyStatus.miss--; this.addLog(`${this.enemyName} missed!`); this.turn = 'player'; this.busy = false; return }
+
+    // Dodge
+    if (this.playerBuff?.dodge > 0) {
+      this.playerBuff.dodge--
+      this.addLog('Phase Shift! Dodged attack!')
+      this.turn = 'player'; this.busy = false
+      return
+    }
+
+    let def = getDef(p)
+    if (this.playerBuff?.shieldTurns > 0) { def = Math.floor(def * 1.5); this.playerBuff.shieldTurns-- }
+
+    const eDmg = Math.max(1, eAtk - def + Phaser.Math.Between(-2, 4))
     p.hp = Math.max(0, p.hp - eDmg)
     this.addLog(`${this.enemyName} attacks for ${eDmg}!`)
     this.tweens.add({ targets: this.enemySprite, x: '-=20', duration: 100, yoyo: true })
@@ -937,21 +1321,35 @@ class CombatScene extends Phaser.Scene {
     p.kills = (p.kills || 0) + 1
     p.explores = (p.explores || 0) + 1
 
-    const goldGain = Phaser.Math.Between(eData.gold[0], eData.gold[1])
-    p.gold += goldGain
+    let goldGain = Phaser.Math.Between(eData.gold[0], eData.gold[1])
+    let expGain  = eData.exp
 
-    // World event bonus
-    let expGain = eData.exp
+    // World event bonuses
     if (bridge.worldEvent) {
-      const zone = ZONES.find(z => z.id === p.zone)
-      if ((bridge.worldEvent.effect === 'exp_forest' && zone?.id === 'Forest') ||
-          (bridge.worldEvent.effect === 'exp_ruins'  && zone?.id === 'Ruins')) {
-        expGain = Math.floor(expGain * 2)
+      const ev = bridge.worldEvent.effect
+      const zoneNow = ZONES.find(z => z.id === p.zone)
+      if (ev === 'exp_forest' && zoneNow?.id === 'Forest') expGain = Math.floor(expGain * 2)
+      if (ev === 'exp_ruins'  && zoneNow?.id === 'Ruins')  expGain = Math.floor(expGain * 2)
+      if (ev === 'gold_bonus') goldGain *= 2
+      if (ev === 'spell_boost' && p.int > p.str)           expGain = Math.floor(expGain * 1.4)
+      if (ev === 'plague') {
+        goldGain *= 3
+        if (eData.loot?.[0]) p.inventory.push(eData.loot[0])
       }
     }
 
-    p.exp += expGain
+    p.gold += goldGain
+    p.exp  += expGain
     this.addLog(`Victory! +${expGain} EXP  +${goldGain}g`)
+
+    // Reputation gain (based on zone's kingdom affinity)
+    const zone = ZONES.find(z => z.id === p.zone)
+    const repGain = Math.floor(expGain / 20)
+    if (zone) {
+      if (zone.id === 'Forest' || zone.id === 'Mountains') gainRep(p, 'Iron', repGain)
+      if (zone.id === 'Shadow' || zone.id === 'Ruins')    gainRep(p, 'Arcanum', repGain)
+      if (zone.id === 'Capital')                          gainRep(p, 'Ocean', repGain)
+    }
 
     // Loot drop
     let loot = []
@@ -984,6 +1382,15 @@ class CombatScene extends Phaser.Scene {
   }
 
   endCombat(won) {
+    if (won && this.isBoss) {
+      this.result.bossKill  = true
+      this.result.zoneId    = this.zoneId
+      this.result.enemyName = this.enemyName
+    }
+    if (won && this.isPK) {
+      this.result.pkKill = true
+      this.result.pkGold = Phaser.Math.Between(30, 80) + this.player.level * 5
+    }
     this.scene.stop('Combat')
     if (this.overworldScene) {
       this.overworldScene.onCombatEnd(this.result)
@@ -1308,6 +1715,120 @@ class RankingsScene extends Phaser.Scene {
   }
 }
 
+// ── CraftingScene ──
+class CraftingScene extends Phaser.Scene {
+  constructor() { super('Crafting') }
+  init(data) { this.player = data.player }
+
+  create() {
+    const W = this.scale.width, H = this.scale.height
+    this.cameras.main.setBackgroundColor('rgba(0,0,0,0.9)')
+    this.add.rectangle(W/2, H/2, W-20, H-20, 0x0d1117).setStrokeStyle(1, 0x44ff88)
+    this.add.text(W/2, 14, '⚒ CRAFTING', { font: '10px monospace', fill: '#44ff88', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5)
+    this.add.text(W/2, 27, 'Click a recipe to craft it', { font: '6px monospace', fill: '#888888' }).setOrigin(0.5)
+
+    let y = 42
+    CRAFTING.forEach(recipe => {
+      const canCraft = recipe.needs.every(ingredient => this.player.inventory.includes(ingredient))
+      const color = canCraft ? '#88ff88' : '#555555'
+
+      const row = this.add.text(W/2, y, `${recipe.desc}`, {
+        font: '6px monospace', fill: color, stroke: '#000', strokeThickness: 1
+      }).setOrigin(0.5, 0)
+
+      if (canCraft) {
+        row.setInteractive()
+        row.on('pointerover', () => row.setStyle({ fill: '#ffffff' }))
+        row.on('pointerout',  () => row.setStyle({ fill: color }))
+        row.on('pointerdown', () => this.craft(recipe))
+      }
+      y += 12
+    })
+
+    // Inventory summary
+    y += 10
+    this.add.text(W/2, y, '── Your Materials ──', { font: '6px monospace', fill: '#888888' }).setOrigin(0.5)
+    y += 10
+    const mats = this.player.inventory.filter(n => ITEMS[n]?.type === 'material')
+    const counts = {}
+    mats.forEach(m => { counts[m] = (counts[m]||0)+1 })
+    Object.entries(counts).forEach(([name, cnt]) => {
+      this.add.text(W/2, y, `${name} ×${cnt}`, { font: '6px monospace', fill: '#aaffaa' }).setOrigin(0.5)
+      y += 9
+    })
+    if (Object.keys(counts).length === 0) {
+      this.add.text(W/2, y, 'No materials.', { font: '6px monospace', fill: '#555555' }).setOrigin(0.5)
+    }
+
+    this.add.text(W - 16, H - 12, '[C/ESC] Close', { font: '6px monospace', fill: '#888888' }).setOrigin(1, 1)
+    this.input.keyboard.on('keydown-C',   () => this.scene.stop('Crafting'))
+    this.input.keyboard.on('keydown-ESC', () => this.scene.stop('Crafting'))
+  }
+
+  craft(recipe) {
+    const p = this.player
+    // Remove ingredients
+    recipe.needs.forEach(ingredient => {
+      const idx = p.inventory.indexOf(ingredient)
+      if (idx !== -1) p.inventory.splice(idx, 1)
+    })
+    p.inventory.push(recipe.result)
+    saveGame(p)
+    // Restart scene to refresh
+    this.scene.restart()
+  }
+}
+
+// ── ReputationScene ──
+class ReputationScene extends Phaser.Scene {
+  constructor() { super('Reputation') }
+  init(data) { this.player = data.player }
+
+  create() {
+    const W = this.scale.width, H = this.scale.height
+    const p = this.player
+    this.cameras.main.setBackgroundColor('rgba(0,0,0,0.9)')
+    this.add.rectangle(W/2, H/2, W-20, H-20, 0x0d1117).setStrokeStyle(1, 0xff8844)
+    this.add.text(W/2, 14, '◎ REPUTATION', { font: '10px monospace', fill: '#ff8844', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5)
+
+    let y = 36
+    Object.entries(KINGDOMS).forEach(([kid, k]) => {
+      const rep = (p.reputation?.[kid] || 0)
+      const title = getRepTitle(rep)
+      const barW = Math.min(200, Math.max(0, Math.floor((rep / 5000) * 200)))
+      const barColor = rep >= 0 ? Phaser.Display.Color.HexStringToColor(k.hexStr.replace('#','')).color : 0xff2222
+
+      this.add.text(30, y, `${k.icon} ${k.label}`, { font: '8px monospace', fill: k.hexStr }).setOrigin(0, 0.5)
+      this.add.text(W - 30, y, `${title} (${rep})`, { font: '7px monospace', fill: rep >= 0 ? '#88ff88' : '#ff4444' }).setOrigin(1, 0.5)
+      y += 12
+
+      // Bar
+      this.add.rectangle(30 + 100, y, 200, 6, 0x222222).setOrigin(0.5)
+      if (barW > 0) this.add.rectangle(30, y, barW, 6, barColor).setOrigin(0, 0.5)
+      y += 14
+    })
+
+    // Boss kills
+    y += 8
+    this.add.text(W/2, y, '── Boss Kills ──', { font: '7px monospace', fill: '#ff4444' }).setOrigin(0.5); y += 12
+    const bossKills = p.bossKills || {}
+    Object.entries(BOSSES).forEach(([zid, boss]) => {
+      const killed = bossKills[zid]
+      this.add.text(W/2, y, `${boss.name}: ${killed ? '✓ SLAIN' : '○ Alive'}`, {
+        font: '6px monospace', fill: killed ? '#ff4444' : '#555555'
+      }).setOrigin(0.5); y += 10
+    })
+
+    // PK stats
+    y += 4
+    this.add.text(W/2, y, `PK Kills: ${p.pkKills||0}  Deaths: ${p.pkDeaths||0}`, { font: '6px monospace', fill: '#ff8844' }).setOrigin(0.5)
+
+    this.add.text(W - 16, H - 12, '[P/ESC] Close', { font: '6px monospace', fill: '#888888' }).setOrigin(1, 1)
+    this.input.keyboard.on('keydown-P',   () => this.scene.stop('Reputation'))
+    this.input.keyboard.on('keydown-ESC', () => this.scene.stop('Reputation'))
+  }
+}
+
 // ══════════════════════════════════════════════════════════
 // REACT COMPONENT
 // ══════════════════════════════════════════════════════════
@@ -1343,7 +1864,7 @@ export default function Game() {
       pixelArt: true,
       antialias: false,
       physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
-      scene: [BootScene, OverworldScene, CombatScene, ShopScene, InventoryScene, ZoneMapScene, StatAllocScene, RankingsScene],
+      scene: [BootScene, OverworldScene, CombatScene, ShopScene, InventoryScene, ZoneMapScene, StatAllocScene, RankingsScene, CraftingScene, ReputationScene],
     }
 
     const game = new Phaser.Game(config)
@@ -1437,7 +1958,7 @@ export default function Game() {
         )}
 
         <div style={{ marginTop: 20, fontSize: 10, color: '#555', textAlign: 'center' }}>
-          WASD/Arrows: Move  |  E: Interact  |  K: Fight  |  I: Inventory  |  M: Map  |  R: Rankings
+          WASD: Move  |  E: Shop  |  K: Fight  |  B: Boss  |  I: Inventory  |  C: Craft  |  M: Map  |  P: Reputation  |  R: Rankings
         </div>
       </div>
     )
