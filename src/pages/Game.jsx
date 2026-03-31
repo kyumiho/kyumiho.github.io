@@ -235,7 +235,6 @@ function initPlayer(name, kingdom) {
     inventory: ['Health Potion', 'Health Potion'],
     equipment: { weapon: null, armor: null },
     kills: 0, explores: 0, trades: 0,
-    reputation: { Iron: 0, Arcanum: 0, Ocean: 0 },
     pkKills: 0, pkDeaths: 0,
     worldDay: 1,
     reputation: { Iron: 0, Arcanum: 0, Ocean: 0 },
@@ -1722,14 +1721,16 @@ class CombatScene extends Phaser.Scene {
     this.updateBars()
 
     if (p.hp <= 0) {
+      SFX.defeat()
+      this.cameras.main.shake(200, 0.015)
       this.addLog('You have been defeated...')
       p.hp = Math.floor(p.maxHp * 0.15)
       p.pkDeaths = (p.pkDeaths||0) + 1
       this.time.delayedCall(1200, () => {
-        // Drop random item on death (PK-lite: lose some gold)
         const goldLoss = Math.floor(p.gold * 0.1)
         p.gold = Math.max(0, p.gold - goldLoss)
-        this.addLog(`Lost ${goldLoss} gold on defeat.`)
+        p.zone = 'Capital'
+        this.addLog(`Lost ${goldLoss}g. Respawned at Capital.`)
         this.time.delayedCall(800, () => this.endCombat(false))
       })
       return
