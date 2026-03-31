@@ -744,6 +744,24 @@ class OverworldScene extends Phaser.Scene {
       }).setOrigin(0.5, 1).setDepth(6)
     })
 
+    // Treasure chests (hidden in zones)
+    this.chests = this.physics.add.staticGroup()
+    const chestSpots = [
+      { x: 120, y: 160, loot: ['Wolf Pelt', 'Health Potion', 'Health Potion'], gold: 30 },
+      { x: 520, y: 140, loot: ['Stone Core', 'Iron Sword'],                   gold: 80 },
+      { x: 100, y: 440, loot: ['Shadow Essence', 'Mana Elixir'],               gold: 120 },
+      { x: 560, y: 420, loot: ['Ancient Core', 'Elixir'],                      gold: 200 },
+      { x: 320, y: 430, loot: ['Void Dust', 'Mana Elixir', 'Health Potion'],   gold: 150 },
+    ]
+    const openedChests = bridge.player.openedChests || []
+    chestSpots.forEach((cs, i) => {
+      if (openedChests.includes(i)) return
+      const chest = this.chests.create(cs.x, cs.y, 'chest')
+      chest.chestIndex = i; chest.chestData = cs
+      chest.setDepth(3)
+    })
+    this.physics.add.overlap(this.playerSprite, this.chests, (pl, chest) => this.openChest(chest), null, this)
+
     // World boundary
     this.physics.world.setBounds(0, 0, MAP_W * TILE, MAP_H * TILE)
   }
@@ -786,21 +804,59 @@ class OverworldScene extends Phaser.Scene {
   }
 
   createUI() {
+    const W = this.scale.width, H = this.scale.height
+
+    // Left panel background
+    this.add.rectangle(0, 0, 160, 165, 0x000000, 0.7).setOrigin(0,0).setScrollFactor(0).setDepth(98)
+
     // Fixed UI (not affected by camera)
     this.statusText = this.add.text(8, 8,  '', { font: '8px monospace', fill: '#00ff88', stroke: '#000', strokeThickness: 2 }).setScrollFactor(0).setDepth(100)
     this.zoneText   = this.add.text(8, 60, '', { font: '7px monospace', fill: '#ffdd44', stroke: '#000', strokeThickness: 2 }).setScrollFactor(0).setDepth(100)
-    this.msgText    = this.add.text(8, 80, '', { font: '6px monospace', fill: '#aaccff', stroke: '#000', strokeThickness: 2, wordWrap:{width:200} }).setScrollFactor(0).setDepth(100)
+    this.msgText    = this.add.text(8, 80, '', { font: '6px monospace', fill: '#aaccff', stroke: '#000', strokeThickness: 2, wordWrap:{width:150} }).setScrollFactor(0).setDepth(100)
     this.eventText  = this.add.text(8, 130,'', { font: '6px monospace', fill: '#ff8844', stroke: '#000', strokeThickness: 2 }).setScrollFactor(0).setDepth(100)
+    this.dayText    = this.add.text(8, 145,'', { font: '6px monospace', fill: '#8888ff', stroke: '#000', strokeThickness: 1 }).setScrollFactor(0).setDepth(100)
+
+    // Minimap (top-right corner)
+    this.createMinimap(W, H)
 
     // Bottom bar
-    const W = this.scale.width
-    const H = this.scale.height
-    this.bottomBar = this.add.rectangle(0, H - 20, W, 20, 0x000000, 0.8).setOrigin(0,0).setScrollFactor(0).setDepth(99)
-    this.helpText  = this.add.text(8, H - 16, 'WASD:Move  E:Shop  K:Fight  B:Boss  I:Inv  C:Craft  Q:Quests  M:Map  P:Rep  R:Rank', {
+    this.add.rectangle(0, H - 20, W, 20, 0x000000, 0.8).setOrigin(0,0).setScrollFactor(0).setDepth(99)
+    this.helpText = this.add.text(8, H - 16, 'WASD:Move  E:Shop  K:Fight  B:Boss  I:Inv  C:Craft  Q:Quests  M:Map  P:Rep  R:Rank', {
       font: '6px monospace', fill: '#888888'
     }).setScrollFactor(0).setDepth(100)
 
     this.updateUI()
+  }
+
+  createMinimap(W, H) {
+    const MM_X = W - 90, MM_Y = 8
+    const MM_W = 82, MM_H = 70
+    const SCALE = MM_W / 640
+
+    // Background
+    this.add.rectangle(MM_X - 2, MM_Y - 2, MM_W + 4, MM_H + 4, 0x000000, 0.85).setOrigin(0,0).setScrollFactor(0).setDepth(98)
+    this.add.rectangle(MM_X, MM_Y, MM_W, MM_H, 0x0a0a14).setOrigin(0,0).setScrollFactor(0).setDepth(99)
+    this.add.text(MM_X + MM_W/2, MM_Y - 8, 'MAP', { font: '5px monospace', fill: '#888888' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(100)
+
+    // Zone dots
+    ZONES.forEach(zone => {
+      const hidden = zone.hidden && !bridge.discoveredZones?.includes(zone.id)
+      if (hidden) return
+      const zx = MM_X + zone.x * SCALE
+      const zy = MM_Y + zone.y * (MM_H / 480)
+      const visited = bridge.player.zone === zone.id
+      const canEnter = zone.minLv <= bridge.player.level
+
+      const dot = this.add.circle(zx, zy, 3, visited ? 0xffdd44 : canEnter ? 0x00aa44 : 0x441111)
+        .setScrollFactor(0).setDepth(101)
+      this.add.text(zx, zy + 4, zone.id[0], { font: '5px monospace', fill: '#aaaaaa' })
+        .setOrigin(0.5, 0).setScrollFactor(0).setDepth(101)
+    })
+
+    // Player dot (updates in updateUI)
+    this.minimapPlayer = this.add.circle(0, 0, 2, 0x00ffff).setScrollFactor(0).setDepth(102)
+    this.minimapPlayerX = MM_X; this.minimapPlayerY = MM_Y
+    this.minimapScaleX = SCALE; this.minimapScaleY = MM_H / 480
   }
 
   updateUI() {
@@ -815,7 +871,18 @@ class OverworldScene extends Phaser.Scene {
     this.zoneText.setText(zone ? `Zone: ${zone.label}  Danger: ${'★'.repeat(zone.danger)}` : '')
 
     if (bridge.worldEvent) {
-      this.eventText.setText(`EVENT: ${bridge.worldEvent.label}`)
+      this.eventText.setText(`⚡ ${bridge.worldEvent.label}`)
+    } else {
+      this.eventText.setText('')
+    }
+    this.dayText.setText(`Day ${bridge.player.worldDay || 1}  Kills:${bridge.player.kills||0}  PK:${bridge.player.pkKills||0}`)
+
+    // Update minimap player position
+    if (this.minimapPlayer && this.playerSprite) {
+      this.minimapPlayer.setPosition(
+        this.minimapPlayerX + this.playerSprite.x * this.minimapScaleX,
+        this.minimapPlayerY + this.playerSprite.y * this.minimapScaleY
+      )
     }
 
     // Update HP bar on player sprite
@@ -922,6 +989,27 @@ class OverworldScene extends Phaser.Scene {
   }
 
   setupWorldTimer() {
+    // Day/night visual overlay
+    this.nightOverlay = this.add.rectangle(0, 0, 640, 480, 0x000033, 0).setOrigin(0,0).setDepth(50).setScrollFactor(0)
+    this.dayPhase = 0 // 0=day 1=dusk 2=night 3=dawn
+
+    this.time.addEvent({
+      delay: 15000, // phase every 15s (full day = 60s)
+      loop: true,
+      callback: () => {
+        this.dayPhase = (this.dayPhase + 1) % 4
+        const phases = [
+          { alpha: 0,    label: '☀ Dawn',   color: '#ffdd44' },
+          { alpha: 0.1,  label: '🌅 Dusk',  color: '#ff8844' },
+          { alpha: 0.35, label: '🌙 Night', color: '#8888ff' },
+          { alpha: 0.15, label: '⭐ Late',  color: '#aaaaff' },
+        ]
+        const ph = phases[this.dayPhase]
+        this.tweens.add({ targets: this.nightOverlay, alpha: ph.alpha, duration: 3000 })
+        this.showMessage(ph.label, ph.color)
+      }
+    })
+
     // Advance world day every 60 real seconds
     this.time.addEvent({
       delay: 60000,
@@ -1135,6 +1223,22 @@ class OverworldScene extends Phaser.Scene {
     ;['Inventory', 'ZoneMap', 'Shop', 'Rankings', 'StatAlloc', 'Crafting', 'Reputation', 'QuestLog'].forEach(s => {
       if (this.scene.isActive(s)) this.scene.stop(s)
     })
+  }
+
+  openChest(chest) {
+    if (!chest.active) return
+    chest.destroy()
+    const p = bridge.player
+    p.openedChests = p.openedChests || []
+    p.openedChests.push(chest.chestIndex)
+    chest.chestData.loot.forEach(item => p.inventory.push(item))
+    p.gold += chest.chestData.gold
+    SFX.pickup()
+    this.spawnParticles(chest.chestData.x, chest.chestData.y, 0xffd700, 12)
+    this.showMessage(`Treasure! +${chest.chestData.gold}g  +${chest.chestData.loot.join(', ')}`, '#ffd700')
+    checkQuests(p, this)
+    saveGame(p)
+    this.updateUI()
   }
 
   getQuestProgress(p, q) {
