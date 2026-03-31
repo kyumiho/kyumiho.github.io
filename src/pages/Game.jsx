@@ -308,6 +308,22 @@ function loadGame() {
   } catch(e) { return null }
 }
 
+function exportSaveCode(player) {
+  try {
+    const data = JSON.stringify(player)
+    return btoa(encodeURIComponent(data))
+  } catch(e) { return '' }
+}
+
+function importSaveCode(code) {
+  try {
+    const data = decodeURIComponent(atob(code.trim()))
+    const p = JSON.parse(data)
+    p.maxHp = getMaxHp(p); p.maxMp = getMaxMp(p)
+    return p
+  } catch(e) { return null }
+}
+
 // ══════════════════════════════════════════════════════════
 // PHASER SCENES
 // ══════════════════════════════════════════════════════════
@@ -1614,6 +1630,7 @@ class CombatScene extends Phaser.Scene {
     SFX.attack()
     this.tweens.add({ targets: this.playerSprite, x: '+=20', duration: 100, yoyo: true, onComplete: () => {
       SFX.hit()
+      this.cameras.main.shake(80, 0.006)
       this.updateBars()
       if (this.enemyData.hp <= 0) { this.victory(); return }
       this.time.delayedCall(400, () => this.enemyTurn())
@@ -1700,6 +1717,7 @@ class CombatScene extends Phaser.Scene {
     const eDmg = Math.max(1, eAtk - def + Phaser.Math.Between(-2, 4))
     p.hp = Math.max(0, p.hp - eDmg)
     this.addLog(`${this.enemyName} attacks for ${eDmg}!`)
+    this.cameras.main.shake(60, 0.005)
     this.tweens.add({ targets: this.enemySprite, x: '-=20', duration: 100, yoyo: true })
     this.updateBars()
 
@@ -2384,12 +2402,15 @@ export default function Game() {
   const containerRef = useRef(null)
   const gameRef      = useRef(null)
 
-  const [screen, setScreen] = useState('menu') // menu | create | play | loading
+  const [screen, setScreen] = useState('menu')
   const [savedPlayer, setSavedPlayer] = useState(null)
   const [charName, setCharName]   = useState('')
   const [kingdom,  setKingdom]    = useState('Iron')
   const [error,    setError]      = useState('')
   const [rankings, setRankings]   = useState({})
+  const [saveCode, setSaveCode]   = useState('')
+  const [importCode, setImportCode] = useState('')
+  const [importMsg,  setImportMsg]  = useState('')
 
   useEffect(() => {
     const saved = loadGame()
@@ -2511,8 +2532,35 @@ export default function Game() {
           </div>
         )}
 
-        <div style={{ marginTop: 20, fontSize: 10, color: '#555', textAlign: 'center' }}>
-          WASD: Move  |  E: Shop  |  K: Fight  |  B: Boss  |  I: Inventory  |  C: Craft  |  M: Map  |  P: Reputation  |  R: Rankings
+        {/* Save Code Import/Export */}
+        <div style={{ marginTop: 20, background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: 4, padding: '12px 18px', minWidth: 340 }}>
+          <div style={{ color: '#666', fontSize: 10, letterSpacing: 2, marginBottom: 8 }}>SAVE CODE</div>
+          {savedPlayer && (
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input readOnly value={saveCode || '(click Export)'}
+                  style={{ flex:1, background:'#0a0a0a', border:'1px solid #333', color:'#666', padding:'3px 6px', fontFamily:'monospace', fontSize:9, borderRadius:2 }}
+                />
+                <button onClick={() => setSaveCode(exportSaveCode(savedPlayer))} style={{ ...btnStyle('#555','#111'), padding:'4px 10px', fontSize:10 }}>Export</button>
+              </div>
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <input value={importCode} onChange={e => setImportCode(e.target.value)} placeholder="Paste save code to import..."
+              style={{ flex:1, background:'#0a0a0a', border:'1px solid #444', color:'#ccc', padding:'3px 6px', fontFamily:'monospace', fontSize:9, borderRadius:2, outline:'none' }}
+            />
+            <button onClick={() => {
+              const p = importSaveCode(importCode)
+              if (p) { saveGame(p); setSavedPlayer(p); setImportMsg('Loaded!'); setImportCode('') }
+              else setImportMsg('Invalid!')
+              setTimeout(() => setImportMsg(''), 3000)
+            }} style={{ ...btnStyle('#4488ff','#111'), padding:'4px 10px', fontSize:10 }}>Import</button>
+          </div>
+          {importMsg && <div style={{ fontSize: 10, color: importMsg === 'Loaded!' ? '#00ff88' : '#ff4444', marginTop: 4 }}>{importMsg}</div>}
+        </div>
+
+        <div style={{ marginTop: 14, fontSize: 10, color: '#555', textAlign: 'center' }}>
+          WASD: Move  |  E: Shop  |  K: Fight  |  B: Boss  |  Q: Quests  |  C: Craft  |  M: Map  |  P: Rep  |  R: Rank
         </div>
       </div>
     )
