@@ -312,6 +312,48 @@ function loadGame() {
 // PHASER SCENES
 // ══════════════════════════════════════════════════════════
 
+// ── Web Audio SFX ──
+const SFX = (() => {
+  let ctx = null
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)()
+    return ctx
+  }
+  function tone(freq, type, duration, vol = 0.15, startFreq = null) {
+    try {
+      const ac = getCtx()
+      const osc = ac.createOscillator()
+      const gain = ac.createGain()
+      osc.connect(gain); gain.connect(ac.destination)
+      osc.type = type
+      if (startFreq) {
+        osc.frequency.setValueAtTime(startFreq, ac.currentTime)
+        osc.frequency.linearRampToValueAtTime(freq, ac.currentTime + duration)
+      } else {
+        osc.frequency.value = freq
+      }
+      gain.gain.setValueAtTime(vol, ac.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration)
+      osc.start(ac.currentTime)
+      osc.stop(ac.currentTime + duration)
+    } catch(e) {}
+  }
+  return {
+    attack:   () => { tone(220, 'square', 0.1, 0.12); tone(180, 'sawtooth', 0.08, 0.08) },
+    hit:      () => { tone(110, 'sawtooth', 0.15, 0.2, 220) },
+    magic:    () => { tone(660, 'sine', 0.3, 0.12); tone(880, 'sine', 0.2, 0.08) },
+    levelUp:  () => { [440,550,660,880].forEach((f,i) => setTimeout(() => tone(f,'sine',0.15,0.12), i*80)) },
+    victory:  () => { [330,440,550,440,660].forEach((f,i) => setTimeout(() => tone(f,'square',0.12,0.1), i*100)) },
+    defeat:   () => { tone(220, 'sawtooth', 0.4, 0.15, 440) },
+    pickup:   () => { tone(880, 'sine', 0.1, 0.1); tone(1100, 'sine', 0.08, 0.08) },
+    portal:   () => { tone(440, 'sine', 0.4, 0.1, 220) },
+    boss:     () => { [110,90,80].forEach((f,i) => setTimeout(() => tone(f,'sawtooth',0.3,0.2), i*150)) },
+    heal:     () => { tone(660, 'sine', 0.2, 0.1); tone(770, 'sine', 0.15, 0.08) },
+    buy:      () => { tone(550, 'sine', 0.1, 0.08); tone(660, 'sine', 0.08, 0.06) },
+    craft:    () => { tone(440, 'square', 0.05, 0.08); tone(550, 'square', 0.05, 0.06) },
+  }
+})()
+
 // Shared state bridge between React and Phaser
 const bridge = { player: null, callbacks: {} }
 
@@ -327,135 +369,254 @@ class BootScene extends Phaser.Scene {
   createTextures() {
     const g = this.make.graphics({ x: 0, y: 0, add: false })
 
-    // Player sprite 16x16
+    // ── Player walk spritesheet: 3 frames × 16px wide, 16px tall ──
+    // Frame 0: idle, Frame 1: step-left, Frame 2: step-right
+    const playerFrames = [
+      () => {
+        g.fillStyle(0xf5deb3); g.fillRect(5,1,6,6)   // head
+        g.fillStyle(0x1a3a8a); g.fillRect(4,7,8,6)    // body (darker blue)
+        g.fillStyle(0xf5deb3); g.fillRect(2,8,3,5)    // left arm
+        g.fillStyle(0xf5deb3); g.fillRect(11,8,3,5)   // right arm
+        g.fillStyle(0x1a3a8a); g.fillRect(4,13,4,3)   // left leg
+        g.fillStyle(0x1a3a8a); g.fillRect(8,13,4,3)   // right leg
+        g.fillStyle(0xd4a800); g.fillRect(5,1,6,2)    // hair
+        g.fillStyle(0x000000); g.fillRect(6,4,1,1); g.fillRect(9,4,1,1) // eyes
+        g.fillStyle(0xaaaaff); g.fillRect(4,9,3,2)    // belt detail
+      },
+      () => {
+        g.fillStyle(0xf5deb3); g.fillRect(5,1,6,6)
+        g.fillStyle(0x1a3a8a); g.fillRect(4,7,8,6)
+        g.fillStyle(0xf5deb3); g.fillRect(2,7,3,5)    // left arm up
+        g.fillStyle(0xf5deb3); g.fillRect(11,9,3,5)   // right arm down
+        g.fillStyle(0x1a3a8a); g.fillRect(3,13,4,3)   // left leg forward
+        g.fillStyle(0x1a3a8a); g.fillRect(9,12,4,3)   // right leg back
+        g.fillStyle(0xd4a800); g.fillRect(5,1,6,2)
+        g.fillStyle(0x000000); g.fillRect(6,4,1,1); g.fillRect(9,4,1,1)
+      },
+      () => {
+        g.fillStyle(0xf5deb3); g.fillRect(5,1,6,6)
+        g.fillStyle(0x1a3a8a); g.fillRect(4,7,8,6)
+        g.fillStyle(0xf5deb3); g.fillRect(2,9,3,5)    // left arm down
+        g.fillStyle(0xf5deb3); g.fillRect(11,7,3,5)   // right arm up
+        g.fillStyle(0x1a3a8a); g.fillRect(4,12,4,3)   // left leg back
+        g.fillStyle(0x1a3a8a); g.fillRect(8,13,4,3)   // right leg forward
+        g.fillStyle(0xd4a800); g.fillRect(5,1,6,2)
+        g.fillStyle(0x000000); g.fillRect(6,4,1,1); g.fillRect(9,4,1,1)
+      },
+    ]
+    // Generate spritesheet 48×16
+    const sheetG = this.make.graphics({ x:0, y:0, add:false })
+    playerFrames.forEach((draw, i) => {
+      g.clear(); draw()
+      // blit via RenderTexture
+      const rt = this.add.renderTexture(0, 0, 16, 16).setVisible(false)
+      rt.draw(g, 0, 0)
+      rt.saveTexture(`player_f${i}`)
+      rt.destroy()
+    })
+    sheetG.destroy()
+
+    // Player simple texture for HP bar use
     g.clear()
-    g.fillStyle(0xf5deb3); g.fillRect(5,1,6,6)   // head
-    g.fillStyle(0x4169e1); g.fillRect(4,7,8,6)    // body
-    g.fillStyle(0xf5deb3); g.fillRect(2,8,3,5)    // left arm
-    g.fillStyle(0xf5deb3); g.fillRect(11,8,3,5)   // right arm
-    g.fillStyle(0x4169e1); g.fillRect(4,13,3,3)   // left leg
-    g.fillStyle(0x4169e1); g.fillRect(9,13,3,3)   // right leg
-    g.fillStyle(0xd4a800); g.fillRect(6,2,4,1)    // hair
+    g.fillStyle(0xf5deb3); g.fillRect(5,1,6,6)
+    g.fillStyle(0x1a3a8a); g.fillRect(4,7,8,6)
+    g.fillStyle(0xf5deb3); g.fillRect(2,8,3,5); g.fillRect(11,8,3,5)
+    g.fillStyle(0x1a3a8a); g.fillRect(4,13,4,3); g.fillRect(8,13,4,3)
+    g.fillStyle(0xd4a800); g.fillRect(5,1,6,2)
+    g.fillStyle(0x000000); g.fillRect(6,4,1,1); g.fillRect(9,4,1,1)
     g.generateTexture('player', 16, 16)
 
-    // Enemy sprites
+    // ── Enemy sprites — more detailed ──
     const enemyDefs = [
-      { key:'enemy_goblin',  body:0x4a8a4a, head:0x6ab86a },
-      { key:'enemy_wolf',    body:0x8b7355, head:0xa08060 },
-      { key:'enemy_golem',   body:0x888888, head:0xaaaaaa },
-      { key:'enemy_wraith',  body:0x6a0dad, head:0x9a3ddd },
-      { key:'enemy_knight',  body:0x222244, head:0x444488 },
-      { key:'enemy_drake',   body:0xcc4422, head:0xff6644 },
-      { key:'enemy_demon',   body:0x330033, head:0x660066 },
+      { key:'enemy_goblin',  body:0x3a6a3a, head:0x5a9a5a, eyes:0xff4400, detail:0x2a2a00 },
+      { key:'enemy_wolf',    body:0x6b5335, head:0x8a6848, eyes:0xff6600, detail:0x3a2a1a },
+      { key:'enemy_golem',   body:0x666666, head:0x999999, eyes:0x00ffff, detail:0x444444 },
+      { key:'enemy_wraith',  body:0x5a0a9a, head:0x8a2acc, eyes:0xffffff, detail:0x3a005a },
+      { key:'enemy_knight',  body:0x1a1a33, head:0x3a3a66, eyes:0xff2200, detail:0x888888 },
+      { key:'enemy_drake',   body:0xaa3311, head:0xdd5533, eyes:0xffee00, detail:0x881100 },
+      { key:'enemy_demon',   body:0x220022, head:0x550055, eyes:0xff0000, detail:0xaa0000 },
     ]
-    enemyDefs.forEach(({ key, body, head }) => {
+    enemyDefs.forEach(({ key, body, head, eyes, detail }) => {
       g.clear()
-      g.fillStyle(head); g.fillRect(4,1,8,7)
-      g.fillStyle(body); g.fillRect(3,8,10,6)
-      g.fillStyle(body); g.fillRect(1,9,3,4)
-      g.fillStyle(body); g.fillRect(12,9,3,4)
-      g.fillStyle(body); g.fillRect(4,14,3,3)
-      g.fillStyle(body); g.fillRect(9,14,3,3)
-      g.fillStyle(0xff2222); g.fillRect(5,3,2,2); g.fillRect(9,3,2,2) // eyes
+      // Head
+      g.fillStyle(head);   g.fillRect(4,1,8,7)
+      g.fillStyle(detail); g.fillRect(4,1,8,1)     // top shadow
+      // Eyes
+      g.fillStyle(eyes);   g.fillRect(5,3,2,2); g.fillRect(9,3,2,2)
+      // Body
+      g.fillStyle(body);   g.fillRect(3,8,10,6)
+      g.fillStyle(detail); g.fillRect(3,8,10,1)    // chest line
+      // Arms
+      g.fillStyle(body);   g.fillRect(1,9,3,4); g.fillRect(12,9,3,4)
+      // Legs
+      g.fillStyle(body);   g.fillRect(4,14,3,2); g.fillRect(9,14,3,2)
       g.generateTexture(key, 16, 16)
     })
 
-    // Tiles 16x16
-    const tiles = [
-      { key:'tile_grass',    base:0x2d5a1b, detail:0x3a7a25 },
-      { key:'tile_dark',     base:0x0a0a1a, detail:0x15152a },
-      { key:'tile_stone',    base:0x555555, detail:0x444444 },
-      { key:'tile_water',    base:0x1a4d8a, detail:0x2060aa },
-      { key:'tile_sand',     base:0xc8a850, detail:0xd4b860 },
-      { key:'tile_ruin',     base:0x7a6a50, detail:0x6a5a40 },
-      { key:'tile_abyss',    base:0x080010, detail:0x100020 },
+    // ── Tiles — richer detail ──
+    const tileData = [
+      { key:'tile_grass', fn: () => {
+        g.fillStyle(0x2d5a1b); g.fillRect(0,0,16,16)
+        g.fillStyle(0x3a7a25); g.fillRect(0,0,16,1); g.fillRect(0,8,16,1); // horizontal lines
+        g.fillStyle(0x1e3e10); g.fillRect(0,15,16,1)
+        g.fillStyle(0x4a9a30); g.fillRect(2,4,1,3); g.fillRect(6,10,1,3); g.fillRect(12,2,1,3); g.fillRect(9,7,1,2) // grass blades
+      }},
+      { key:'tile_dark', fn: () => {
+        g.fillStyle(0x0a0a1a); g.fillRect(0,0,16,16)
+        g.fillStyle(0x15152a); g.fillRect(0,0,16,1); g.fillRect(0,8,16,1)
+        g.fillStyle(0x1a0a2a); g.fillRect(3,3,2,2); g.fillRect(11,9,2,2); g.fillRect(7,13,2,2) // purple motes
+      }},
+      { key:'tile_stone', fn: () => {
+        g.fillStyle(0x555555); g.fillRect(0,0,16,16)
+        g.fillStyle(0x444444); g.fillRect(0,0,8,8); g.fillRect(8,8,8,8) // brick pattern
+        g.fillStyle(0x666666); g.fillRect(8,0,8,8); g.fillRect(0,8,8,8)
+        g.fillStyle(0x333333); g.fillRect(0,7,16,2); g.fillRect(7,0,2,16) // mortar
+      }},
+      { key:'tile_water', fn: () => {
+        g.fillStyle(0x1a4d8a); g.fillRect(0,0,16,16)
+        g.fillStyle(0x2060aa); g.fillRect(0,4,16,2); g.fillRect(0,12,16,2)
+        g.fillStyle(0x3a80cc); g.fillRect(2,5,4,1); g.fillRect(10,13,4,1) // highlights
+        g.fillStyle(0x0d3060); g.fillRect(0,0,16,1); g.fillRect(0,8,16,1) // depth lines
+      }},
+      { key:'tile_sand', fn: () => {
+        g.fillStyle(0xc8a850); g.fillRect(0,0,16,16)
+        g.fillStyle(0xd4b860); g.fillRect(3,2,2,1); g.fillRect(9,7,3,1); g.fillRect(5,13,2,1) // sand ripples
+        g.fillStyle(0xaa8830); g.fillRect(0,15,16,1); g.fillRect(11,5,1,2)
+      }},
+      { key:'tile_ruin', fn: () => {
+        g.fillStyle(0x7a6a50); g.fillRect(0,0,16,16)
+        g.fillStyle(0x6a5a40); g.fillRect(0,0,8,8); g.fillRect(8,8,8,8)
+        g.fillStyle(0x8a7a60); g.fillRect(8,0,8,8); g.fillRect(0,8,8,8)
+        g.fillStyle(0x4a3a28); g.fillRect(0,7,16,2); g.fillRect(7,0,2,16)
+        g.fillStyle(0x2a1a10); g.fillRect(2,2,2,2); g.fillRect(12,11,2,2) // cracks
+      }},
+      { key:'tile_abyss', fn: () => {
+        g.fillStyle(0x080010); g.fillRect(0,0,16,16)
+        g.fillStyle(0x100020); g.fillRect(0,0,16,1); g.fillRect(0,5,16,1); g.fillRect(0,10,16,1)
+        g.fillStyle(0x200040); g.fillRect(4,3,1,1); g.fillRect(11,8,1,1); g.fillRect(7,14,1,1) // void sparks
+      }},
     ]
-    tiles.forEach(({ key, base, detail }) => {
-      g.clear()
-      g.fillStyle(base); g.fillRect(0,0,16,16)
-      g.fillStyle(detail)
-      for (let i = 0; i < 4; i++) {
-        const rx = Math.floor(Math.random()*14)
-        const ry = Math.floor(Math.random()*14)
-        g.fillRect(rx, ry, 2, 2)
-      }
-      g.generateTexture(key, 16, 16)
-    })
+    tileData.forEach(({ key, fn }) => { g.clear(); fn(); g.generateTexture(key, 16, 16) })
 
-    // Tree 16x16
+    // ── Animated water (2 frames) ──
     g.clear()
-    g.fillStyle(0x4a2e0a); g.fillRect(6,10,4,6)
-    g.fillStyle(0x1a6a1a); g.fillRect(2,5,12,8)
-    g.fillStyle(0x228b22); g.fillRect(4,2,8,6)
-    g.fillStyle(0x2aaa2a); g.fillRect(6,0,4,4)
-    g.generateTexture('tree', 16, 16)
+    g.fillStyle(0x1a5a9a); g.fillRect(0,0,16,16)
+    g.fillStyle(0x2878cc); g.fillRect(0,3,16,2); g.fillRect(0,11,16,2)
+    g.fillStyle(0x40a0ee); g.fillRect(1,4,5,1); g.fillRect(9,12,5,1)
+    g.generateTexture('tile_water_a1', 16, 16)
+    g.clear()
+    g.fillStyle(0x1a4d8a); g.fillRect(0,0,16,16)
+    g.fillStyle(0x2060aa); g.fillRect(0,6,16,2); g.fillRect(0,14,16,2)
+    g.fillStyle(0x3a80cc); g.fillRect(2,7,4,1); g.fillRect(10,15,4,1)
+    g.generateTexture('tile_water_a2', 16, 16)
 
-    // Rock
+    // ── Tree (larger, 24×24) ──
     g.clear()
-    g.fillStyle(0x888888); g.fillRect(2,6,12,8)
-    g.fillStyle(0x999999); g.fillRect(4,4,8,4)
-    g.fillStyle(0x666666); g.fillRect(2,12,12,2)
+    g.fillStyle(0x5a3a0a); g.fillRect(9,15,6,9)   // trunk
+    g.fillStyle(0x2a6a00); g.fillRect(4,10,16,8)  // canopy base
+    g.fillStyle(0x3a8800); g.fillRect(6,6,12,7)   // mid canopy
+    g.fillStyle(0x4aa800); g.fillRect(8,2,8,7)    // top
+    g.fillStyle(0x5acd00); g.fillRect(10,3,4,3)   // highlight
+    g.fillStyle(0x1a4400); g.fillRect(4,17,16,1)  // shadow
+    g.generateTexture('tree', 24, 24)
+
+    // ── Rock (improved) ──
+    g.clear()
+    g.fillStyle(0x666666); g.fillRect(2,8,12,6)
+    g.fillStyle(0x888888); g.fillRect(4,5,8,5)
+    g.fillStyle(0x999999); g.fillRect(6,4,4,3)    // top highlight
+    g.fillStyle(0x555555); g.fillRect(2,13,12,1)  // bottom shadow
+    g.fillStyle(0x444444); g.fillRect(8,9,2,3)    // crack
     g.generateTexture('rock', 16, 16)
 
-    // Building
+    // ── Building (larger, 24×32) ──
     g.clear()
-    g.fillStyle(0x8b7355); g.fillRect(2,6,12,10)
-    g.fillStyle(0xcc4422); g.fillRect(0,4,16,4)
-    g.fillStyle(0x5a3a1a); g.fillRect(6,10,4,6)
-    g.fillStyle(0xaaffff); g.fillRect(3,8,3,3); g.fillRect(10,8,3,3)
-    g.generateTexture('building', 16, 16)
+    g.fillStyle(0x9a8465); g.fillRect(0,8,24,24)  // walls
+    g.fillStyle(0xcc4422); g.fillRect(0,4,24,6)   // roof
+    g.fillStyle(0xdd5533); g.fillRect(2,3,20,3)   // roof highlight
+    g.fillStyle(0x5a3a1a); g.fillRect(8,18,8,14)  // door
+    g.fillStyle(0xaaffff); g.fillRect(2,11,5,5); g.fillRect(17,11,5,5) // windows
+    g.fillStyle(0x88cccc); g.fillRect(3,12,2,2); g.fillRect(18,12,2,2) // window detail
+    g.fillStyle(0x6a5040); g.fillRect(0,31,24,1)  // base shadow
+    g.generateTexture('building', 24, 32)
 
-    // Portal
+    // ── Portal (16×24, animated-look) ──
     g.clear()
-    g.fillStyle(0x8800ff); g.fillRect(4,2,8,12)
-    g.fillStyle(0xaa44ff); g.fillRect(6,4,4,8)
-    g.fillStyle(0xffffff); g.fillRect(7,6,2,4)
-    g.generateTexture('portal', 16, 16)
+    g.fillStyle(0x6600cc); g.fillRect(4,4,8,16)
+    g.fillStyle(0x8800ff); g.fillRect(5,3,6,18)
+    g.fillStyle(0xaa44ff); g.fillRect(6,5,4,14)
+    g.fillStyle(0xcc88ff); g.fillRect(7,7,2,10)
+    g.fillStyle(0xffffff); g.fillRect(7,9,2,6)    // inner glow
+    g.fillStyle(0x440088); g.fillRect(3,8,2,8); g.fillRect(11,8,2,8) // frame
+    g.generateTexture('portal', 16, 24)
 
-    // Chest
+    // ── Chest ──
     g.clear()
-    g.fillStyle(0x8b6914); g.fillRect(1,6,14,8)
-    g.fillStyle(0xd4a800); g.fillRect(0,5,16,3)
-    g.fillStyle(0x555500); g.fillRect(6,8,4,3)
+    g.fillStyle(0x8b6914); g.fillRect(1,8,14,7)   // base
+    g.fillStyle(0xd4a800); g.fillRect(0,6,16,4)   // lid top
+    g.fillStyle(0xffcc00); g.fillRect(1,7,14,2)   // lid highlight
+    g.fillStyle(0x8b5c00); g.fillRect(0,14,16,1)  // bottom shadow
+    g.fillStyle(0xffd700); g.fillRect(6,9,4,3)    // lock plate
+    g.fillStyle(0x664400); g.fillRect(7,10,2,2)   // lock hole
     g.generateTexture('chest', 16, 16)
 
-    // NPC
-    g.clear()
-    g.fillStyle(0xffe4b5); g.fillRect(5,1,6,6)
-    g.fillStyle(0xcc4422); g.fillRect(4,7,8,6)
-    g.fillStyle(0xffe4b5); g.fillRect(2,8,3,5)
-    g.fillStyle(0xffe4b5); g.fillRect(11,8,3,5)
-    g.fillStyle(0x8b4513); g.fillRect(4,13,3,3)
-    g.fillStyle(0x8b4513); g.fillRect(9,13,3,3)
-    g.fillStyle(0xffd700); g.fillRect(5,0,6,3) // crown
-    g.generateTexture('npc', 16, 16)
+    // ── NPC variants (3 types: guild, shop, chronicle) ──
+    const npcDefs = [
+      { key:'npc',       skin:0xffe4b5, top:0xcc4422, crown:0xffd700 },
+      { key:'npc_shop',  skin:0xffd090, top:0x2244aa, crown:0x00ccff },
+      { key:'npc_chron', skin:0xffc090, top:0x224422, crown:0xaaffaa },
+    ]
+    npcDefs.forEach(({ key, skin, top, crown }) => {
+      g.clear()
+      g.fillStyle(skin);   g.fillRect(5,2,6,5)    // head
+      g.fillStyle(0x000000); g.fillRect(6,4,1,1); g.fillRect(9,4,1,1) // eyes
+      g.fillStyle(top);    g.fillRect(4,7,8,7)    // body
+      g.fillStyle(skin);   g.fillRect(2,8,3,4); g.fillRect(11,8,3,4) // arms
+      g.fillStyle(top);    g.fillRect(4,14,3,2); g.fillRect(9,14,3,2) // legs
+      g.fillStyle(crown);  g.fillRect(4,1,8,3)    // hat/crown
+      g.fillStyle(0xffffff); g.fillRect(5,9,6,2)  // shirt front
+      g.generateTexture(key, 16, 16)
+    })
 
-    // Sword item drop
-    g.clear()
-    g.fillStyle(0xcccccc); g.fillRect(7,1,2,10)
-    g.fillStyle(0xd4a800); g.fillRect(4,8,8,2)
-    g.fillStyle(0x888888); g.fillRect(6,11,4,4)
+    // ── Items ──
+    g.clear() // sword
+    g.fillStyle(0xdddddd); g.fillRect(7,0,2,11)
+    g.fillStyle(0xd4a800); g.fillRect(4,9,8,2)
+    g.fillStyle(0xaaaaaa); g.fillRect(7,0,2,1)    // tip
+    g.fillStyle(0x666666); g.fillRect(6,11,4,5)   // grip
+    g.fillStyle(0xffd700); g.fillRect(7,13,2,1)   // pommel
     g.generateTexture('item_sword', 16, 16)
 
-    // Potion item drop
-    g.clear()
-    g.fillStyle(0xff6688); g.fillRect(5,4,6,9)
-    g.fillStyle(0xffffff); g.fillRect(6,5,2,3)
-    g.fillStyle(0x888888); g.fillRect(6,2,4,3)
-    g.fillStyle(0x888888); g.fillRect(7,1,2,2)
+    g.clear() // potion
+    g.fillStyle(0xff4466); g.fillRect(5,5,6,9)
+    g.fillStyle(0xff88aa); g.fillRect(6,6,2,4)    // highlight
+    g.fillStyle(0xcccccc); g.fillRect(6,2,4,4)    // neck
+    g.fillStyle(0x999999); g.fillRect(7,1,2,2)    // stopper
+    g.fillStyle(0xffffff); g.fillRect(5,13,6,1)   // base shine
     g.generateTexture('item_potion', 16, 16)
 
-    // Coin
-    g.clear()
+    g.clear() // coin
+    g.fillStyle(0xddaa00); g.fillRect(3,4,10,8)
     g.fillStyle(0xffd700); g.fillRect(4,3,8,10)
-    g.fillStyle(0xffee00); g.fillRect(5,4,6,8)
-    g.fillStyle(0xcc9900); g.fillRect(6,6,4,4)
+    g.fillStyle(0xffee44); g.fillRect(5,4,6,8)
+    g.fillStyle(0xcc8800); g.fillRect(7,6,2,4)    // G symbol
+    g.fillStyle(0xffff88); g.fillRect(5,5,2,2)    // shine
     g.generateTexture('coin', 16, 16)
 
-    // UI panel bg
+    // ── UI elements ──
     g.clear()
     g.fillStyle(0x000000, 0.85); g.fillRect(0,0,1,1)
     g.generateTexture('panel', 1, 1)
+
+    // Shadow/fog overlay for dark zones
+    g.clear()
+    g.fillStyle(0x000000, 0.5); g.fillRect(0,0,1,1)
+    g.generateTexture('fog', 1, 1)
+
+    // Minimap dot
+    g.clear()
+    g.fillStyle(0x00ff88); g.fillRect(0,0,4,4)
+    g.generateTexture('minimap_dot', 4, 4)
 
     g.destroy()
   }
@@ -514,6 +675,25 @@ class OverworldScene extends Phaser.Scene {
       }
     }
 
+    // Animate water tiles between the Forest and Capital (river)
+    this.waterTiles = []
+    for (let tx = 13; tx < 16; tx++) {
+      for (let ty = 12; ty < 18; ty++) {
+        const wt = this.add.image(tx * TILE + 8, ty * TILE + 8, 'tile_water_a1')
+        this.waterTiles.push(wt)
+      }
+    }
+    let waterFrame = 0
+    this.time.addEvent({
+      delay: 600,
+      loop: true,
+      callback: () => {
+        waterFrame = 1 - waterFrame
+        const key = waterFrame === 0 ? 'tile_water_a1' : 'tile_water_a2'
+        this.waterTiles.forEach(t => t.setTexture(key))
+      }
+    })
+
     // Place zone decorations
     this.placeDecorations()
 
@@ -534,29 +714,29 @@ class OverworldScene extends Phaser.Scene {
     // Place NPCs at capital
     this.npcs = this.physics.add.staticGroup()
     const npcPositions = [
-      { x: 296, y: 264, name: 'Guild Master',
+      { x: 296, y: 264, sprite: 'npc',       name: 'Guild Master',
         dialog: ['Welcome, adventurer.', 'Kill 10 Goblins — earn your first rank.', 'Find hidden jobs through experience.', 'Press B near a zone portal to fight the boss!'],
         quest: { id:'first_blood', label:'First Blood', goal:'kills', target:10, reward:{ gold:200, exp:300 }, desc:'Kill 10 enemies.' }
       },
-      { x: 344, y: 264, name: 'Shop Keeper',
+      { x: 344, y: 264, sprite: 'npc_shop',  name: 'Shop Keeper',
         dialog: ['Buy, sell, or trade!', 'Press E to open the shop.', 'Craft materials into gear with C!'],
         quest: { id:'rich_quick', label:'Supply Run', goal:'trades', target:5, reward:{ gold:300, item:'Elixir' }, desc:'Buy or sell 5 times.' }
       },
-      { x: 320, y: 300, name: 'Chronicle',
+      { x: 320, y: 300, sprite: 'npc_chron', name: 'Chronicle',
         dialog: ['The world records your deeds.', 'Rankings update with each kill.', 'Defeat bosses to climb the leaderboard!', 'Kill all 5 zone bosses to be crowned Champion.'],
         quest: { id:'boss_slayer', label:'Boss Slayer', goal:'bossKills', target:3, reward:{ gold:1000, exp:2000 }, desc:'Defeat 3 zone bosses.' }
       },
-      { x: 280, y: 300, name: 'Old Hermit',
+      { x: 280, y: 300, sprite: 'npc',       name: 'Old Hermit',
         dialog: ['I sense great darkness in the Abyss...', 'Three relics seal the Abyssal God.', 'Drake Scale, Ancient Core, Void Crystal — bring them to me.', 'Then you may face the true final boss.'],
         quest: { id:'relic_hunt', label:'Relic Hunt', goal:'inventory_all', items:['Drake Scale','Ancient Core','Void Crystal'], reward:{ gold:2000, exp:5000, unlock:'AbyssGod' }, desc:'Collect 3 relics for the hermit.' }
       },
-      { x: 360, y: 300, name: 'Kingdom Envoy',
+      { x: 360, y: 300, sprite: 'npc_shop',  name: 'Kingdom Envoy',
         dialog: ['Each kingdom seeks loyal champions.', 'Build reputation through battle.', 'Reach 1000 rep with your kingdom for a title!', 'True power comes from mastering all kingdoms.'],
         quest: { id:'rep_grind', label:'Kingdom Champion', goal:'reputation', target:1000, reward:{ gold:500, title:'Champion' }, desc:'Reach 1000 reputation with your home kingdom.' }
       },
     ]
     npcPositions.forEach(n => {
-      const npc = this.npcs.create(n.x, n.y, 'npc')
+      const npc = this.npcs.create(n.x, n.y, n.sprite || 'npc')
       npc.npcData = n
       npc.setDepth(3)
       this.add.text(n.x, n.y - 10, n.name, {
@@ -848,6 +1028,7 @@ class OverworldScene extends Phaser.Scene {
     }
     bridge.player.zone = zoneId
     this.updateUI()
+    SFX.portal()
     this.showMessage(`Entering ${zone.label}...`, '#88ffaa')
 
     // Auto-explore after entering non-safe zone
@@ -974,6 +1155,7 @@ class OverworldScene extends Phaser.Scene {
   onCombatEnd(result) {
     this.updateUI()
     if (result.levelUp) {
+      SFX.levelUp()
       this.showNotification(`LEVEL UP!`, `Now Lv.${bridge.player.level}\nYou have ${bridge.player.statPoints} stat points!`, '#ffdd44')
       this.spawnParticles(this.playerSprite?.x || 320, this.playerSprite?.y || 280, 0x00ff88, 16)
       this.time.delayedCall(500, () => {
@@ -1177,6 +1359,7 @@ class CombatScene extends Phaser.Scene {
         const dmg = p.int * 6
         this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
         this.addLog(`✦ Arcane Bolt: ${dmg} magic dmg (ignores DEF)!`)
+        SFX.magic()
         this.updateBars()
         if (this.enemyData.hp <= 0) { this.victory(); return }
         this.time.delayedCall(400, () => this.enemyTurn())
@@ -1208,6 +1391,7 @@ class CombatScene extends Phaser.Scene {
         const heal = 20
         this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
         p.hp = Math.min(p.maxHp, p.hp + heal)
+        SFX.magic(); SFX.heal()
         this.addLog(`✟ Holy Smite: ${dmg} dmg, +${heal} HP!`)
         this.updateBars()
         if (this.enemyData.hp <= 0) { this.victory(); return }
@@ -1217,6 +1401,7 @@ class CombatScene extends Phaser.Scene {
       case 'heal': {
         const heal = Math.floor(p.maxHp * 0.6)
         p.hp = Math.min(p.maxHp, p.hp + heal)
+        SFX.heal()
         this.addLog(`✟ Lay Hands: +${heal} HP (${p.hp}/${p.maxHp})`)
         this.updateBars()
         this.time.delayedCall(400, () => this.enemyTurn())
@@ -1322,7 +1507,9 @@ class CombatScene extends Phaser.Scene {
     if (this.enemyStatus?.trap) { dmg *= 2; this.enemyStatus.trap = false; this.addLog('TRAP!') }
     this.enemyData.hp = Math.max(0, this.enemyData.hp - dmg)
     this.addLog(`You attack for ${dmg} dmg!`)
+    SFX.attack()
     this.tweens.add({ targets: this.playerSprite, x: '+=20', duration: 100, yoyo: true, onComplete: () => {
+      SFX.hit()
       this.updateBars()
       if (this.enemyData.hp <= 0) { this.victory(); return }
       this.time.delayedCall(400, () => this.enemyTurn())
@@ -1461,6 +1648,7 @@ class CombatScene extends Phaser.Scene {
 
     p.gold += goldGain
     p.exp  += expGain
+    SFX.victory()
     this.addLog(`Victory! +${expGain} EXP  +${goldGain}g`)
 
     // Reputation gain (based on zone's kingdom affinity)
@@ -1501,6 +1689,7 @@ class CombatScene extends Phaser.Scene {
 
     if (this.isBoss) {
       this.cameras.main.flash(500, 255, 50, 50)
+      SFX.boss()
     }
     this.time.delayedCall(1200, () => this.endCombat(true))
   }
@@ -1601,6 +1790,7 @@ class ShopScene extends Phaser.Scene {
       if (item.int) p.int += item.int
     }
 
+    SFX.buy()
     this.goldText.setText(`Gold: ${p.gold}g`)
     this.showMsg(`Bought ${name}!`, '#00ff88')
     saveGame(p)
@@ -2021,14 +2211,13 @@ class CraftingScene extends Phaser.Scene {
 
   craft(recipe) {
     const p = this.player
-    // Remove ingredients
     recipe.needs.forEach(ingredient => {
       const idx = p.inventory.indexOf(ingredient)
       if (idx !== -1) p.inventory.splice(idx, 1)
     })
     p.inventory.push(recipe.result)
+    SFX.craft()
     saveGame(p)
-    // Restart scene to refresh
     this.scene.restart()
   }
 }
