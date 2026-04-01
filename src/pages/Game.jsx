@@ -1167,36 +1167,32 @@ class OverworldScene extends Phaser.Scene {
 
   setupInput() {
     this.cursors = this.input.keyboard.createCursorKeys()
-    this.wasd = this.input.keyboard.addKeys({
-      W: Phaser.Input.Keyboard.KeyCodes.W,
-      A: Phaser.Input.Keyboard.KeyCodes.A,
-      S: Phaser.Input.Keyboard.KeyCodes.S,
-      D: Phaser.Input.Keyboard.KeyCodes.D,
-    })
-    // Capture these keys so the browser doesn't scroll the page
-    this.input.keyboard.addCapture([
-      Phaser.Input.Keyboard.KeyCodes.W,
-      Phaser.Input.Keyboard.KeyCodes.A,
-      Phaser.Input.Keyboard.KeyCodes.S,
-      Phaser.Input.Keyboard.KeyCodes.D,
-      Phaser.Input.Keyboard.KeyCodes.UP,
-      Phaser.Input.Keyboard.KeyCodes.DOWN,
-      Phaser.Input.Keyboard.KeyCodes.LEFT,
-      Phaser.Input.Keyboard.KeyCodes.RIGHT,
-      Phaser.Input.Keyboard.KeyCodes.SPACE,
-    ])
 
-    this.input.keyboard.on('keydown-E',   () => this.interact())
-    this.input.keyboard.on('keydown-I',   () => this.openInventory())
-    this.input.keyboard.on('keydown-M',   () => this.openZoneMap())
-    this.input.keyboard.on('keydown-K',   () => this.tryFight())
-    this.input.keyboard.on('keydown-R',   () => this.scene.launch('Rankings', { player: this.player }))
-    this.input.keyboard.on('keydown-ESC', () => this.closeAllPanels())
-    this.input.keyboard.on('keydown-F5',  e => { e.preventDefault(); this.quickSave() })
-    this.input.keyboard.on('keydown-B',   () => this.tryBossFight())
-    this.input.keyboard.on('keydown-C',   () => this.openCraft())
-    this.input.keyboard.on('keydown-P',   () => this.openReputation())
-    this.input.keyboard.on('keydown-Q',   () => this.openQuestLog())
+    // Track WASD/arrow movement state directly via window events
+    // (bypasses Phaser keyboard plugin issues in 3.90)
+    this.keys = {}
+    this._onKeyDown = (e) => {
+      this.keys[e.code] = true
+      // Only fire action keys when Overworld is the top-level active scene
+      if (!this.sys.isActive()) return
+      // Prevent page scroll on arrows/space
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault()
+      // Action keys
+      if (e.code === 'KeyE')   this.interact()
+      if (e.code === 'KeyI')   this.openInventory()
+      if (e.code === 'KeyM')   this.openZoneMap()
+      if (e.code === 'KeyK')   this.tryFight()
+      if (e.code === 'KeyB')   this.tryBossFight()
+      if (e.code === 'KeyC')   this.openCraft()
+      if (e.code === 'KeyP')   this.openReputation()
+      if (e.code === 'KeyQ')   this.openQuestLog()
+      if (e.code === 'KeyR')   this.scene.launch('Rankings', { player: this.player })
+      if (e.code === 'Escape') this.closeAllPanels()
+      if (e.code === 'F5')     { e.preventDefault(); this.quickSave() }
+    }
+    this._onKeyUp = (e) => { this.keys[e.code] = false }
+    window.addEventListener('keydown', this._onKeyDown)
+    window.addEventListener('keyup',   this._onKeyUp)
 
     // NPC proximity chat
     this.physics.add.overlap(this.playerSprite, this.npcs, (pl, npc) => {
@@ -1258,10 +1254,11 @@ class OverworldScene extends Phaser.Scene {
     if (this.inventoryOpen || this.mapOpen) return
 
     const spd = 60 + bridge.player.agi * 2
-    const vx = (this.cursors.left.isDown  || this.wasd.A.isDown) ? -spd :
-               (this.cursors.right.isDown || this.wasd.D.isDown) ?  spd : 0
-    const vy = (this.cursors.up.isDown    || this.wasd.W.isDown) ? -spd :
-               (this.cursors.down.isDown  || this.wasd.S.isDown) ?  spd : 0
+    const k = this.keys || {}
+    const vx = (this.cursors.left.isDown  || k['KeyA'] || k['ArrowLeft'])  ? -spd :
+               (this.cursors.right.isDown || k['KeyD'] || k['ArrowRight']) ?  spd : 0
+    const vy = (this.cursors.up.isDown    || k['KeyW'] || k['ArrowUp'])    ? -spd :
+               (this.cursors.down.isDown  || k['KeyS'] || k['ArrowDown'])  ?  spd : 0
 
     this.playerSprite.setVelocity(vx, vy)
 
@@ -1476,6 +1473,12 @@ class OverworldScene extends Phaser.Scene {
       this.scene.stop('ZoneMap')
       this.mapOpen = false
     }
+  }
+
+  shutdown() {
+    // Clean up window listeners when scene is destroyed
+    if (this._onKeyDown) window.removeEventListener('keydown', this._onKeyDown)
+    if (this._onKeyUp)   window.removeEventListener('keyup',   this._onKeyUp)
   }
 
   closeAllPanels() {
@@ -2677,13 +2680,30 @@ export default function Game() {
       backgroundColor: '#0d1117',
       pixelArt: true,
       antialias: false,
-      input: { keyboard: { target: window } },
       physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
       scene: [BootScene, OverworldScene, CombatScene, ShopScene, InventoryScene, ZoneMapScene, StatAllocScene, RankingsScene, CraftingScene, ReputationScene, QuestLogScene, EndingScene],
     }
 
     const game = new Phaser.Game(config)
     gameRef.current = game
+
+    // Prevent browser scroll on WASD/arrows while game is active
+    const preventScroll = (e) => {
+      if (['w','a','s','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('keydown', preventScroll, { passive: false })
+
+    // Auto-focus the canvas so keyboard events work without clicking first
+    game.events.once('ready', () => {
+      const canvas = containerRef.current?.querySelector('canvas')
+      if (canvas) {
+        canvas.setAttribute('tabindex', '0')
+        canvas.style.outline = 'none'
+        canvas.focus()
+      }
+    })
 
     bridge.callbacks.returnToMenu = () => {
       if (gameRef.current) { gameRef.current.destroy(true); gameRef.current = null }
@@ -2693,6 +2713,7 @@ export default function Game() {
     }
 
     return () => {
+      window.removeEventListener('keydown', preventScroll)
       if (gameRef.current) {
         gameRef.current.destroy(true)
         gameRef.current = null
@@ -2713,7 +2734,10 @@ export default function Game() {
 
   function continueGame() {
     if (!savedPlayer) return
-    bridge.player = savedPlayer
+    const p = { ...savedPlayer }
+    // If player has old map coordinates (< 640), reset to new Capital center
+    if (!p.x || p.x < 640) { p.x = 800; p.y = 560; p.zone = 'Capital' }
+    bridge.player = p
     bridge.worldEvent = null
     bridge.discoveredZones = ['Capital','Forest','Mountains','Shadow','Ruins']
     setScreen('play')
@@ -2931,7 +2955,11 @@ export default function Game() {
   if (screen === 'play') {
     return (
       <div style={{ position: 'relative', width: '100%', height: '100vh', background: '#0d1117' }}>
-        <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+        <div
+          ref={containerRef}
+          style={{ width: '100%', height: '100%' }}
+          onClick={() => containerRef.current?.querySelector('canvas')?.focus()}
+        />
         <button
           onClick={quitGame}
           style={{
